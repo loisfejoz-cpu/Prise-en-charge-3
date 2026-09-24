@@ -18,6 +18,7 @@
       --paper: #ffffff;
       --wash: #f3f7f4;
       --shadow: 0 8px 26px rgba(17, 53, 33, .09);
+      --print-project-name: "Rapport de prise en charge";
     }
     * { box-sizing: border-box; }
     [hidden] { display: none !important; }
@@ -38,7 +39,7 @@
       border-bottom: 1px solid #dce5df;
     }
     .brand {
-      display: inline-block;
+      display: inline-block; align-self: flex-start; width: fit-content;
       color: #27a956;
       font-size: clamp(26px, 8vw, 42px);
       font-weight: 800;
@@ -71,10 +72,11 @@
       outline: none;
       background: transparent;
       color: #101411;
-      font-size: clamp(24px, 7vw, 38px);
+      font-size: clamp(20px, 5vw, 34px);
       font-weight: 800;
       text-transform: uppercase;
     }
+    #projectNamePrint { display: none; overflow-wrap: anywhere; word-break: break-word; }
     #projectName:focus { border-color: var(--green); }
     .cover-photo-block { margin-top: 20px; }
     .cover-photo-frame {
@@ -98,6 +100,9 @@
       width: 100%; min-height: 44px; padding: 10px 11px;
       border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink);
     }
+    .input-menu { display: grid; grid-template-columns: minmax(0, 1fr) 44px; }
+    .input-menu input { min-width: 0; border-radius: 9px 0 0 9px; }
+    .menu-trigger { min-height: 44px; border: 1px solid var(--line); border-left: 0; border-radius: 0 9px 9px 0; background: #edf5f0; color: var(--green-dark); font-size: 18px; font-weight: 900; cursor: pointer; }
     .field textarea { min-height: 90px; resize: vertical; }
     .toolbar {
       position: sticky; top: 0; z-index: 20;
@@ -124,7 +129,7 @@
     .dot { width: 18px; height: 18px; border-radius: 4px; border: 1px solid rgba(0,0,0,.18); }
     .section { margin: 0 0 16px; overflow: hidden; border-radius: 14px; }
     .section-title {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      display: grid; grid-template-columns: auto minmax(150px, 1fr) auto; align-items: center; gap: 10px;
       width: 100%; min-height: 54px; padding: 12px 14px;
       border: 0; background: var(--green-dark); color: #fff; font-weight: 900;
       text-transform: uppercase;
@@ -149,7 +154,11 @@
     .item-status { position: absolute; inset: 0 auto 0 0; width: 7px; background: var(--green); }
     .item[data-status="vigilance"] .item-status { background: var(--amber); }
     .item[data-status="solution"] .item-status { background: var(--red); }
-    .item-head { padding: 13px 14px 10px 20px; }
+    .item-head { padding: 0; }
+    .item-collapse-toggle { display: grid; grid-template-columns: minmax(0, 1fr) auto; width: 100%; padding: 13px 14px 10px 20px; border: 0; background: #fff; color: inherit; text-align: left; cursor: pointer; }
+    .item-collapse-toggle .chevron { grid-column: 2; grid-row: 1 / span 2; align-self: center; margin-left: 10px; color: var(--green-dark); font-size: 20px; }
+    .item.collapsed .item-body { display: none; }
+    .item.collapsed .item-collapse-toggle .chevron { transform: rotate(-90deg); }
     .equipment { margin: 0; font-size: 16px; font-weight: 900; text-transform: uppercase; }
     .summary { margin-top: 3px; color: var(--muted); font-size: 12px; }
     .tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
@@ -164,6 +173,9 @@
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .grid .wide { grid-column: 1 / -1; }
     .status-select { border-left-width: 7px !important; }
+    .item[data-status="ok"] .status-select { border-left-color: var(--green) !important; }
+    .item[data-status="vigilance"] .status-select { border-left-color: var(--amber) !important; }
+    .item[data-status="solution"] .status-select { border-left-color: var(--red) !important; }
     .photo-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .photo-label {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -184,6 +196,12 @@
     .item-footer { display: flex; justify-content: flex-end; padding: 0 14px 12px; }
     .delete-item { padding: 7px 10px; border: 0; background: transparent; color: #a12a2a; font-size: 12px; font-weight: 800; cursor: pointer; }
     .add-row { width: 100%; margin-top: 10px; border-style: dashed; }
+    .section-tabs { display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 12px; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+    .section-tab { min-height: 44px; padding: 8px 4px; border: 0; border-right: 1px solid var(--line); background: #f7f9f8; color: #536058; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .section-tab:last-child { border-right: 0; }
+    .section-tab.active { background: #fff; color: var(--green-dark); box-shadow: inset 0 -3px var(--green); }
+    .section-pane { display: none; }
+    .section-pane.active { display: block; }
     .conformity-card { margin-top: 18px; overflow: hidden; border: 1px solid #bfd0c5; border-radius: 10px; background: #fff; box-shadow: none; }
     .conformity-title { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 56px; padding: 12px 16px; border: 0; background: var(--green-dark); color: #fff; cursor: pointer; }
     .conformity-title strong { font-size: 19px; letter-spacing: .04em; }
@@ -221,10 +239,12 @@
     .pie-legend-row strong { font-variant-numeric: tabular-nums; }
     .summary-empty { color: var(--muted); text-align: center !important; }
     .photo-appendix { display: none; }
+    .print-project-footer, .print-field-value { display: none; }
     .photo-sheet { text-align: center; }
     .photo-sheet h2 { margin: 0 0 5mm; color: var(--green-dark); font-size: 16pt; }
     .photo-sheet p { margin: 0 0 5mm; color: var(--muted); }
     .photo-sheet img { display: block; width: 100%; max-height: 230mm; object-fit: contain; }
+    .photo-sheet.equipment-photo img { max-height: 215mm; padding: 1mm; border: 3mm solid var(--photo-status-color, var(--green)); border-radius: 3mm; }
     .save-state {
       position: fixed; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 25;
       padding: 9px 12px; border-radius: 999px; background: #173f2b; color: #fff;
@@ -245,20 +265,54 @@
       .hero { padding-inline: 42px; }
       main { padding-inline: 24px; }
       .section-content { padding: 16px; }
-      .item-head, .pane { padding-left: 24px; }
+      .pane { padding-left: 24px; }
       .grid { grid-template-columns: repeat(4, 1fr); }
       .grid .wide { grid-column: span 2; }
       .tabs { width: 430px; margin-left: 8px; border: 1px solid var(--line); border-radius: 9px 9px 0 0; overflow: hidden; }
     }
-    @media (max-width: 560px) { .chart-area { grid-template-columns: 1fr; } }
-    @page { size: A4 portrait; margin: 10mm; }
+    @media (max-width: 650px) {
+      .section-title { grid-template-columns: 1fr auto; }
+      .section-location-label { grid-column: 1 / -1; }
+      .section-name-input { grid-column: 1; }
+      .section-toggle { grid-column: 2; grid-row: 2; }
+      .chart-area { grid-template-columns: 1fr; }
+      .conformity-content { padding: 10px; }
+      .conformity-table-wrap { overflow: visible; }
+      .conformity-table { min-width: 0; border-collapse: separate; border-spacing: 0 10px; }
+      .conformity-table thead { display: none; }
+      .conformity-table tbody, .conformity-table tr, .conformity-table td { display: block; width: 100%; }
+      .conformity-table tr { overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: #f7f9f8; }
+      .conformity-table td { padding: 9px; border: 0; border-bottom: 1px solid var(--line); }
+      .conformity-table td:last-child { border-bottom: 0; }
+      .conformity-table td::before { display: block; margin-bottom: 5px; color: var(--green-dark); content: attr(data-label); font-size: 10px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+    }
+    @page {
+      size: A4 portrait;
+      margin: 10mm 10mm 18mm;
+      @bottom-left {
+        content: var(--print-project-name);
+        color: #173f2b;
+        font-family: Arial, sans-serif;
+        font-size: 8pt;
+        font-weight: 700;
+      }
+      @bottom-right {
+        content: "Page " counter(page) " / " counter(pages);
+        color: #173f2b;
+        font-family: Arial, sans-serif;
+        font-size: 8pt;
+        font-weight: 700;
+      }
+    }
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { background: #fff; font-size: 10pt; }
-      .toolbar, .tabs, .item-footer, .add-row, #addYellowTab, .save-state, .toast, .photo-label, .photo-help, .cover-photo-remove { display: none !important; }
+      .toolbar, .tabs, .section-tabs, .item-footer, .add-row, #addYellowTab, .save-state, .toast, .photo-label, .photo-help, .cover-photo-remove, .item-collapse-toggle .chevron, .menu-trigger { display: none !important; }
       .page { width: 100%; }
-      .hero { height: 276mm; padding: 4mm 8mm 5mm; overflow: hidden; break-after: page; page-break-after: always; }
+      .hero { height: 262mm; padding: 4mm 8mm 16mm; overflow: hidden; break-after: page; page-break-after: always; }
       .hero .page { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+      #projectName { display: none !important; }
+      #projectNamePrint { display: block; margin: 0; padding: 2mm 0; border-bottom: 2px solid #7c8d82; color: #101411; font-size: clamp(16pt, 4vw, 25pt); font-weight: 800; line-height: 1.05; text-transform: uppercase; }
       .cover-photo-frame { width: 160mm; max-width: 100%; height: 120mm; margin-inline: auto; }
       main { padding: 6mm 8mm; }
       .hero, .intro, .section, .item { box-shadow: none; }
@@ -270,16 +324,29 @@
       .section { break-inside: auto; page-break-inside: auto; border-radius: 0; }
       .section-title { break-after: avoid-page; page-break-after: avoid; }
       .section.collapsed .section-content { display: block; }
+      .section-pane { display: block !important; margin-bottom: 4mm; }
       .conformity-card.collapsed .conformity-content { display: block; }
       .conformity-title { break-after: avoid-page; page-break-after: avoid; }
       .conformity-table-wrap { overflow: visible; }
-      .conformity-table { min-width: 0; }
+      .conformity-table { display: table; min-width: 0; border-collapse: collapse; }
+      .conformity-table thead { display: table-header-group; }
+      .conformity-table tbody { display: table-row-group; }
+      .conformity-table tr { display: table-row; }
+      .conformity-table td, .conformity-table th { display: table-cell; width: auto; padding: 4px; font-size: 8pt; }
+      .conformity-table td::before { display: none; }
       .conformity-table tr { break-inside: avoid-page; page-break-inside: avoid; }
       .item { break-inside: avoid-page !important; page-break-inside: avoid !important; border-radius: 0; }
+      .item.collapsed .item-body { display: block; }
       .item-head, .pane, .grid, .field, .item-footer { break-inside: avoid-page; page-break-inside: avoid; }
       .pane { display: block !important; padding-top: 5px; padding-bottom: 5px; }
       .pane[data-pane="photos"]:has(.empty-photos) { display: none !important; }
+      .section-pane[data-section-pane="photos"]:has(.empty-photos) { display: none !important; }
       input, select, textarea { border-color: #888 !important; }
+      .item[data-status="ok"] .status-select { border-left-color: var(--green) !important; }
+      .item[data-status="vigilance"] .status-select { border-left-color: var(--amber) !important; }
+      .item[data-status="solution"] .status-select { border-left-color: var(--red) !important; }
+      .conformity-choice, .conformity-remark { display: none !important; }
+      .print-field-value { display: block; min-height: 24px; padding: 5px 6px; border: 1px solid #777; border-radius: 4px; background: #fff; white-space: pre-wrap; overflow-wrap: anywhere; }
       .thumbs { grid-template-columns: repeat(5, 1fr); }
       .report-summary { break-before: page; box-shadow: none; border-radius: 0; }
       .summary-table-wrap { overflow: visible; }
@@ -288,6 +355,7 @@
       .photo-appendix:not(:empty) { display: block; break-before: page; page-break-before: always; }
       .photo-sheet { break-after: page; page-break-after: always; }
       .photo-sheet:last-child { break-after: auto; page-break-after: auto; }
+      .print-project-footer { display: none !important; }
     }
   </style>
 </head>
@@ -298,8 +366,8 @@
       <div class="kicker">Rapport de prise en charge</div>
       <label class="project-label" for="projectName">Nom du chantier</label>
       <input id="projectName" type="text" value="CŒUR MÉDITERRANÉE" autocomplete="organization-title">
+      <div id="projectNamePrint"></div>
       <div class="cover-photo-block">
-        <span class="project-label">Photo du chantier</span>
         <div class="cover-photo-frame" id="coverPhotoFrame">
           <div class="cover-photo-empty">Ajoutez une photo horizontale du chantier</div>
           <button class="cover-photo-open" id="coverPhotoOpen" type="button" aria-label="Agrandir la photo du chantier" hidden><img alt="Photo du chantier"></button>
@@ -365,7 +433,9 @@
     </section>
     <section class="photo-appendix" id="photoAppendix" aria-label="Photos des équipements en grand format"></section>
   </main>
+  <div class="print-project-footer" id="printProjectFooter"></div>
 
+  <datalist id="locationSuggestions"></datalist>
   <datalist id="equipmentSuggestions"></datalist>
 
   <div class="save-state" id="saveState" role="status">Enregistré sur cet appareil</div>
@@ -377,9 +447,16 @@
 
   <template id="sectionTemplate">
     <section class="section">
-      <div class="section-title"><span class="section-location-label">LOCALISATION</span><select class="section-name-input" aria-label="Localisation"><option value="">Choisir une localisation</option><option>CHAUFFERIE</option><option>LOCAL PAC</option><option>LOCAL CTA</option><option>LOCAL TRAITEMENT D'EAU</option><option>LOCAL TGBT</option><option>EXTÉRIEUR</option></select><button class="section-toggle" type="button" aria-label="Replier ou déplier"><small class="item-count"></small> <span class="chevron">⌄</span></button></div>
+      <div class="section-title"><span class="section-location-label">LOCALISATION</span><input class="section-name-input" list="locationSuggestions" type="text" aria-label="Type de localisation" placeholder="Choisir ou saisir"><button class="section-toggle" type="button" aria-label="Replier ou déplier"><small class="item-count"></small> <span class="chevron">⌄</span></button></div>
       <div class="section-content">
-        <div class="items"></div><button class="btn add-row" type="button">＋ Ajouter un équipement</button>
+        <div class="section-tabs" role="tablist">
+          <button class="section-tab active" data-section-tab="equipment" type="button">Équipements</button>
+          <button class="section-tab" data-section-tab="remark" type="button">Remarque</button>
+          <button class="section-tab" data-section-tab="photos" type="button">Photos <span class="section-photo-count"></span></button>
+        </div>
+        <div class="section-pane active" data-section-pane="equipment"><div class="items"></div><button class="btn add-row" type="button">＋ Ajouter un équipement</button></div>
+        <div class="section-pane" data-section-pane="remark"><div class="field"><label>Remarque sur la localisation</label><textarea class="section-remark" placeholder="Saisissez vos observations sur cette localisation…"></textarea></div></div>
+        <div class="section-pane" data-section-pane="photos"><div class="photo-actions"><label class="photo-label">📷 Ajouter une photo<input class="section-photo-input" type="file" accept="image/*" capture="environment" multiple></label><span class="photo-help">Vous pouvez ajouter plusieurs photos de la localisation.</span></div><div class="thumbs section-thumbs"></div></div>
         <section class="conformity-card">
           <button class="conformity-title" type="button" aria-expanded="true"><strong>CONFORMITÉ</strong><span class="chevron" aria-hidden="true">⌄</span></button>
           <div class="conformity-content">
@@ -394,8 +471,8 @@
   <template id="itemTemplate">
     <article class="item" data-status="ok">
       <i class="item-status"></i>
-      <div class="item-head"><h3 class="equipment"></h3><div class="summary"></div></div>
-      <div class="tabs" role="tablist">
+      <div class="item-head"><button class="item-collapse-toggle" type="button" aria-expanded="true"><h3 class="equipment"></h3><div class="summary"></div><span class="chevron" aria-hidden="true">⌄</span></button></div>
+      <div class="item-body"><div class="tabs" role="tablist">
         <button class="tab active" data-tab="details" type="button">Détails</button>
         <button class="tab" data-tab="remark" type="button">Remarque</button>
         <button class="tab" data-tab="photos" type="button">Photos <span class="photo-count"></span></button>
@@ -404,10 +481,10 @@
         <div class="grid">
           <div class="field wide"><label>Équipement</label><input data-key="equipment" list="equipmentSuggestions" type="text" placeholder="Choisir ou saisir"></div>
           <div class="field"><label>Quantité</label><input data-key="quantity" type="text" inputmode="text" placeholder="Saisir la quantité"></div>
-          <div class="field"><label>Marque</label><input data-key="brand" type="text" placeholder="Saisir la marque"></div>
-          <div class="field"><label>Modèle</label><input data-key="model" type="text" placeholder="Saisir le modèle"></div>
+          <div class="field"><label>Marque</label><input data-key="brand" type="text" placeholder="Choisir ou saisir la marque" autocomplete="off"></div>
+          <div class="field"><label>Modèle</label><input data-key="model" type="text" placeholder="Choisir ou saisir" autocomplete="off"></div>
           <div class="field wide"><label>N° de série</label><input data-key="serialNumber" type="text" autocomplete="off" placeholder="Saisir le numéro de série"></div>
-          <div class="field wide"><label>Localisation</label><input data-key="location" type="text" placeholder="Saisir la localisation"></div>
+          <div class="field wide"><label>Localisation</label><input data-key="location" type="text" placeholder="Saisir la localisation de l’équipement"></div>
           <div class="field wide"><label>Criticité</label><select class="status-select" data-key="status"><option value="ok">Élément satisfaisant</option><option value="vigilance">Point de vigilance</option><option value="solution">Solution requise</option></select></div>
         </div>
       </div>
@@ -419,7 +496,7 @@
         </div>
         <div class="thumbs"></div>
       </div>
-      <footer class="item-footer"><button class="delete-item" type="button">Supprimer l’équipement</button></footer>
+      <footer class="item-footer"><button class="delete-item" type="button">Supprimer l’équipement</button></footer></div>
     </article>
   </template>
 
@@ -447,7 +524,28 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       let saveTimer = null;
       let coverObjectUrl = null;
       let appendixObjectUrls = [];
-      const locations = ['CHAUFFERIE','LOCAL PAC','LOCAL CTA',"LOCAL TRAITEMENT D'EAU",'LOCAL TGBT','EXTÉRIEUR'];
+      const locations = ['CHAUFFERIE','LOCAL PAC','LOCAL CTA',"LOCAL TRAITEMENT D'EAU",'LOCAL TGBT','SOUS-STATION','EXTÉRIEUR'];
+      const equipmentCatalog = ['CHAUDIÈRE','BRÛLEUR','PAC','GEG','POMPE','PRODUCTION ECS','POMPE DE BOUCLE','CIRCULATEUR','ARMOIRE ÉLECTRIQUE','VMC','CTA','POT À BOUE','ADOUCISSEUR','INJECTION PRODUIT','RÉGULATION','V3V'];
+      const brandCatalogs = {
+        boiler: ['ATLANTIC GUILLOT','BOSCH','CHAPPÉE','DE DIETRICH','ELCO','FRISQUET','HOVAL','SAUNIER DUVAL','VAILLANT','VIESSMANN','WEISHAUPT','YGNIS'],
+        heatPump: ['ATLANTIC','BOSCH','CARRIER','CIAT','DAIKIN','HITACHI','MITSUBISHI ELECTRIC','PANASONIC','TOSHIBA','TRANE','VIESSMANN'],
+        pump: ['ARMSTRONG','CALPEDA','DAB','GRUNDFOS','KSB','LOWARA','SALMSON','WILO'],
+        regulation: ['BELIMO','CAREL','DANFOSS','DELTA CONTROLS','DISTECH CONTROLS','HONEYWELL','JOHNSON CONTROLS','SAUTER','SCHNEIDER ELECTRIC','SIEMENS','TREND CONTROLS']
+      };
+      const modelCatalogs = {
+        'ATLANTIC GUILLOT':['CONDENSINOX','VARFREE','VARMAX'],BOSCH:['COMPRESS 7000I AW','CONDENS 5000 W','CONDENS 7000 F','UNIMAT UT-L'],CHAPPÉE:['KLISTA','LUNA ST'],
+        'DE DIETRICH':['C 230 EVO','C 340','C 640','INNOVENS PRO'],'ELCO':['THISION L PLUS','TRIGON XL','TRIGON XXL'],FRISQUET:['HYDROMOTRIX','PRESTIGE'],HOVAL:['TOPGAS','ULTRAGAS 2'],
+        'SAUNIER DUVAL':['ISOFAST','THEMAFAST'],VAILLANT:['ECOTEC EXCLUSIVE','ECOTEC PLUS'],VIESSMANN:['VITOCAL 200-A','VITOCAL 250-A','VITOCROSSAL 100','VITOCROSSAL 200','VITOCROSSAL 300','VITODENS 200-W'],
+        WEISHAUPT:['WTC-GB','WTC-GW'],YGNIS:['CONDENSINOX','VARMAX'],ATLANTIC:['ALFÉA EXCELLIA','ALFÉA EXTENSA','ALFÉA LORIA'],CARRIER:['30RB','30RQ','30RQP','AQUASNAP'],
+        CIAT:['AQUACIAT','DYNACIAT','POWERCIAT'],DAIKIN:['ALTHERMA 3','EWYK-QZ','EWYT','VRV'],HITACHI:['YUTAKI M','YUTAKI S','YUTAKI S COMBI'],
+        'MITSUBISHI ELECTRIC':['CITY MULTI','ECODAN','ZUBADAN'],PANASONIC:['AQUAREA HIGH PERFORMANCE','AQUAREA T-CAP'],TOSHIBA:['ESTIA'],TRANE:['FLEX HSE','SINTESIS BALANCE'],
+        ARMSTRONG:['COMPASS R','DESIGN ENVELOPE 4300'],CALPEDA:['MXH','NCE HQ','NR'],DAB:['EVOPLUS','EVOSTA 3','KLM'],GRUNDFOS:['ALPHA2','MAGNA3','TPE3','UPS'],KSB:['CALIO','ETABLOC','ETALINE'],
+        LOWARA:['E-LNE','E-SV','ECOCIRC XL'],SALMSON:['PRIUX MASTER','SCX','SIRIUX MASTER'],WILO:['CRONOLINE IL-E','STRATOS MAXO','YONOS MAXO'],
+        BELIMO:['ENERGY VALVE','LMV','PRCA'],CAREL:['BOSS','C.PCO','PCO5+'],DANFOSS:['ECL COMFORT 210','ECL COMFORT 310'],
+        'DELTA CONTROLS':['EBMGR','ENTELIWEB','O3'],'DISTECH CONTROLS':['EC-BOS','ECLYPSE','ECY'],HONEYWELL:['EXCEL 5000','OPTIMIZER','SPYDER'],
+        'JOHNSON CONTROLS':['FACILITY EXPLORER','METASYS'],SAUTER:['ECOS 504/505','EY-MODULO 5','MODU680'],'SCHNEIDER ELECTRIC':['ECOSTRUXURE BUILDING OPERATION','SPACELOGIC','TAC XENTA'],
+        SIEMENS:['CLIMATIX','DESIGO PX','RVD','RVP','SYNCO 700'],'TREND CONTROLS':['IQ4','IQVISION']
+      };
       const conformityChecklist = [
         ['Accès','Coupure électrique extérieure force'],
         ['Accès','Coupure électrique extérieure lumières'],
@@ -551,9 +649,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             row('Dalle de sol','ENS','','TOITURE / PATIO','','ok') ] }
         ]
       };
-      const emptySeed = { projectName: '', coverPhoto: '', coverPhotoData: '', agency: 'marseille', visitDate: '', technician: '', sections: [{ id: uid(), name: '', items: [row()], conformity: clone(conformityChecklist) }] };
+      const emptySeed = { projectName: '', coverPhoto: '', coverPhotoData: '', agency: 'marseille', visitDate: '', technician: '', sections: [{ id: uid(), name: '', remark: '', photos: [], items: [row()], conformity: clone(conformityChecklist) }] };
       const suggestions = {
-        equipment: [...new Set(seed.sections.flatMap(s => s.items.map(i => i.equipment)).filter(Boolean))],
+        equipment: equipmentCatalog,
         quantity: [], brand: [], location: []
       };
       const agencies = {
@@ -574,7 +672,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         candidate.agency = agencies[candidate.agency] ? candidate.agency : 'marseille';
         const legacyChecks=Array.isArray(candidate.conformity)?candidate.conformity:[];
         candidate.sections.forEach(s => {
-          s.id ||= uid(); s.name = normalizeLocation(s.name); s.items ||= []; s.items.forEach(i => { i.id ||= uid(); i.photos ||= []; i.status ||= 'ok'; i.model ??= ''; });
+          s.id ||= uid(); s.name = normalizeLocation(s.name); delete s.specificName; s.remark ??= ''; s.photos ||= []; s.items ||= []; s.items.forEach(i => { i.id ||= uid(); i.photos ||= []; i.status ||= 'ok'; i.model ??= ''; i.location ??= ''; });
           const savedChecks=new Map((Array.isArray(s.conformity)?s.conformity:legacyChecks).map(check=>[check.id,check]));
           s.conformity=conformityChecklist.map(base=>{const saved=savedChecks.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(saved.status)?saved.status:'',remark:String(saved.remark||'')};});
         });
@@ -583,14 +681,30 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       }
       function normalizeLocation(value){
         const text=String(value||'').trim().toUpperCase();if(locations.includes(text))return text;
+        if(text.includes('SOUS')&&text.includes('STATION'))return 'SOUS-STATION';
         if(text.includes('PAC'))return 'LOCAL PAC';if(text.includes('CTA')||text.includes('VENTIL'))return 'LOCAL CTA';
         if(text.includes('EAU')||text.includes('PLOMB'))return "LOCAL TRAITEMENT D'EAU";
-        if(text.includes('TGBT')||text.includes('COURANT'))return 'LOCAL TGBT';if(text.includes('CHAUFF'))return 'CHAUFFERIE';if(text.includes('EXT'))return 'EXTÉRIEUR';return '';
+        if(text.includes('TGBT')||text.includes('COURANT'))return 'LOCAL TGBT';if(text.includes('CHAUFF'))return 'CHAUFFERIE';if(text.includes('EXT'))return 'EXTÉRIEUR';return text;
       }
+      function brandsForEquipment(value){
+        const name=String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
+        if(name.includes('CHAUDIERE'))return brandCatalogs.boiler;
+        if(name==='PAC'||name.includes('POMPE A CHALEUR'))return brandCatalogs.heatPump;
+        if(name.includes('POMPE')||name.includes('CIRCULATEUR'))return brandCatalogs.pump;
+        if(name.includes('REGULATION'))return brandCatalogs.regulation;
+        return [];
+      }
+      function modelsForBrand(value){
+        const brand=String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
+        const key=Object.keys(modelCatalogs).find(name=>name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()===brand);
+        return key?modelCatalogs[key]:[];
+      }
+      function updateProjectNameDisplays(){const name=data.projectName||'Rapport de prise en charge',cssName=name.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/[\r\n]+/g,' ');document.getElementById('projectNamePrint').textContent=name;document.getElementById('printProjectFooter').textContent=name;document.documentElement.style.setProperty('--print-project-name',`"${cssName}"`);document.title=`${name} - Prise en charge`;}
       function load(){
         try { const saved = localStorage.getItem(STORAGE_KEY); data = saved ? cleanData(JSON.parse(saved)) : clone(emptySeed); }
         catch { data = clone(emptySeed); }
         document.getElementById('projectName').value = data.projectName || '';
+        updateProjectNameDisplays();
         document.getElementById('visitDate').value = data.visitDate || '';
         document.getElementById('technician').value = data.technician || '';
         document.getElementById('agencySelect').value = data.agency;
@@ -609,7 +723,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       function statusLabel(status){ return status === 'solution' ? 'Solution requise' : status === 'vigilance' ? 'Point de vigilance' : 'Élément satisfaisant'; }
       function renderAgency(){ document.getElementById('agencyAddress').textContent=(agencies[data.agency]||agencies.marseille).join('\n'); }
       function fillSuggestions(){
-        const lists = { equipmentSuggestions: suggestions.equipment };
+        const lists = { locationSuggestions: locations, equipmentSuggestions: suggestions.equipment };
         Object.entries(lists).forEach(([id, values]) => { const list=document.getElementById(id); values.forEach(value => { const option=document.createElement('option'); option.value=value; list.append(option); }); });
       }
 
@@ -619,11 +733,16 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           const node = document.getElementById('sectionTemplate').content.firstElementChild.cloneNode(true);
           node.dataset.sectionId = section.id;
           const sectionName = node.querySelector('.section-name-input'); sectionName.value = section.name;
-          sectionName.addEventListener('input', () => { section.name = sectionName.value; node.querySelector('.conformity-card').hidden=section.name==='EXTÉRIEUR'; save(); });
+          sectionName.addEventListener('input', () => { section.name = sectionName.value; node.querySelector('.conformity-card').hidden=normalizeLocation(section.name)==='EXTÉRIEUR'; save(); renderSummary(); renderPhotoAppendix(); });
+          sectionName.addEventListener('change',()=>{section.name=normalizeLocation(sectionName.value);save();render();});
+          const sectionRemark=node.querySelector('.section-remark');sectionRemark.value=section.remark||'';sectionRemark.addEventListener('input',()=>{section.remark=sectionRemark.value;save();});
+          node.querySelectorAll('.section-tab').forEach(tab=>tab.addEventListener('click',()=>{node.querySelectorAll('.section-tab,.section-pane').forEach(element=>element.classList.remove('active'));tab.classList.add('active');node.querySelector(`[data-section-pane="${tab.dataset.sectionTab}"]`).classList.add('active');}));
           node.querySelector('.item-count').textContent = `${section.items.length} élément${section.items.length > 1 ? 's' : ''}`;
           node.querySelector('.section-toggle').addEventListener('click', () => node.classList.toggle('collapsed'));
           const list = node.querySelector('.items'); section.items.forEach(item => list.append(renderItem(section, item)));
           node.querySelector('.add-row').addEventListener('click', () => { section.items.push(row()); save(); render(); setTimeout(() => host.querySelector(`[data-section-id="${section.id}"] .item:last-child`)?.scrollIntoView({behavior:'smooth',block:'center'}), 20); });
+          node.querySelector('.section-photo-input').addEventListener('change',async event=>{const files=[...event.target.files];for(const file of files){try{const blob=await resizeImage(file,1800,.82),photoId=uid();await putPhoto(photoId,blob);section.photos.push(photoId);}catch{toast('Impossible d’enregistrer cette photo');}}event.target.value='';save();renderSectionPhotos(node,section);renderPhotoAppendix();});
+          renderSectionPhotos(node,section);
           renderConformity(section,node);
           host.append(node);
         });
@@ -632,27 +751,37 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       }
       function renderConformity(section,node){
         const card=node.querySelector('.conformity-card'),toggle=node.querySelector('.conformity-title'),body=node.querySelector('.conformity-rows');body.replaceChildren();
-        card.hidden=section.name==='EXTÉRIEUR';if(card.hidden)return;
+        card.hidden=normalizeLocation(section.name)==='EXTÉRIEUR';if(card.hidden)return;
         toggle.addEventListener('click',()=>{const collapsed=card.classList.toggle('collapsed');toggle.setAttribute('aria-expanded',String(!collapsed));});
         section.conformity.forEach(check=>{
           const tr=document.createElement('tr'),family=document.createElement('td'),point=document.createElement('td'),statusCell=document.createElement('td'),remarkCell=document.createElement('td');
-          family.textContent=check.family;point.textContent=check.point;
+          family.dataset.label='Famille';point.dataset.label='Point à vérifier';statusCell.dataset.label='Conformité';remarkCell.dataset.label='Remarque';family.textContent=check.family;point.textContent=check.point;
           const select=document.createElement('select');select.className='conformity-choice';select.dataset.value=check.status;select.setAttribute('aria-label',`Conformité : ${check.point}`);
           [['','Choisir…'],['valid','V — Validé'],['na','Non concerné'],['invalid','✕ — Non conforme']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);});
-          select.value=check.status;select.addEventListener('change',()=>{check.status=select.value;select.dataset.value=select.value;save();});
-          const remark=document.createElement('input');remark.className='conformity-remark';remark.type='text';remark.value=check.remark;remark.placeholder='Saisir une remarque';remark.setAttribute('aria-label',`Remarque : ${check.point}`);remark.addEventListener('input',()=>{check.remark=remark.value;save();});
-          statusCell.append(select);remarkCell.append(remark);tr.append(family,point,statusCell,remarkCell);body.append(tr);
+          const statusPrint=document.createElement('span');statusPrint.className='print-field-value';
+          const refreshStatusPrint=()=>{statusPrint.textContent=select.options[select.selectedIndex]?.textContent||'—';};
+          select.value=check.status;refreshStatusPrint();select.addEventListener('change',()=>{check.status=select.value;select.dataset.value=select.value;refreshStatusPrint();save();});
+          const remark=document.createElement('input'),remarkPrint=document.createElement('span');remark.className='conformity-remark';remark.type='text';remark.value=check.remark;remark.placeholder='Saisir une remarque';remark.setAttribute('aria-label',`Remarque : ${check.point}`);remarkPrint.className='print-field-value';remarkPrint.textContent=check.remark||'—';remark.addEventListener('input',()=>{check.remark=remark.value;remarkPrint.textContent=remark.value||'—';save();});
+          statusCell.append(select,statusPrint);remarkCell.append(remark,remarkPrint);tr.append(family,point,statusCell,remarkCell);body.append(tr);
         });
       }
       function renderItem(section, item){
         const node = document.getElementById('itemTemplate').content.firstElementChild.cloneNode(true);
         node.dataset.itemId = item.id; node.dataset.status = item.status;
-        const title = node.querySelector('.equipment'); const summary = node.querySelector('.summary');
-        const refresh = () => { title.textContent = item.equipment || 'Équipement sans nom'; summary.textContent = [item.quantity && `Qté ${item.quantity}`, item.brand, item.model, item.location].filter(Boolean).join(' · '); node.dataset.status = item.status; const sel = node.querySelector('.status-select'); if(sel) sel.style.borderLeftColor = statusColor(item.status); };
+        const title = node.querySelector('.equipment'), summary = node.querySelector('.summary'), equipmentInput=node.querySelector('[data-key="equipment"]'), brandInput = node.querySelector('[data-key="brand"]'), modelInput=node.querySelector('[data-key="model"]'), equipmentList=document.createElement('datalist'),brandList = document.createElement('datalist'),modelList=document.createElement('datalist');
+        const safeId=item.id.replace(/[^a-zA-Z0-9_-]/g,'');
+        equipmentList.id=`equipment-list-${safeId}`;equipmentList.replaceChildren(...equipmentCatalog.map(value=>{const option=document.createElement('option');option.value=value;return option;}));equipmentInput.setAttribute('list',equipmentList.id);equipmentInput.after(equipmentList);
+        brandList.id=`brand-list-${item.id.replace(/[^a-zA-Z0-9_-]/g,'')}`;brandInput.setAttribute('list',brandList.id);brandInput.after(brandList);
+        modelList.id=`model-list-${item.id.replace(/[^a-zA-Z0-9_-]/g,'')}`;modelInput.setAttribute('list',modelList.id);modelInput.after(modelList);
+        [equipmentInput,brandInput,modelInput].forEach(input=>{const wrapper=document.createElement('div'),button=document.createElement('button');wrapper.className='input-menu';button.className='menu-trigger';button.type='button';button.textContent='⌄';button.setAttribute('aria-label',`Ouvrir les choix pour ${input.dataset.key}`);input.before(wrapper);wrapper.append(input,button);button.addEventListener('click',()=>{input.focus();try{input.showPicker?.();}catch{input.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true}));}});});
+        const updateBrandSuggestions=()=>{brandList.replaceChildren(...brandsForEquipment(item.equipment).map(brand=>{const option=document.createElement('option');option.value=brand;return option;}));};
+        const updateModelSuggestions=()=>{modelList.replaceChildren(...modelsForBrand(item.brand).map(model=>{const option=document.createElement('option');option.value=model;return option;}));};
+        const refresh = () => { title.textContent = item.equipment || 'Équipement sans nom'; summary.textContent = [item.quantity && `Qté ${item.quantity}`, item.brand, item.model,item.location].filter(Boolean).join(' · '); node.dataset.status = item.status; updateBrandSuggestions();updateModelSuggestions(); const sel = node.querySelector('.status-select'); if(sel) sel.style.borderLeftColor = statusColor(item.status); };
         node.querySelectorAll('[data-key]').forEach(control => {
           const key = control.dataset.key; control.value = item[key] ?? '';
           control.addEventListener('input', () => { item[key] = control.value; refresh(); save(); renderSummary(); if(key==='equipment'||key==='location')renderPhotoAppendix(); });
         });
+        node.querySelector('.item-collapse-toggle').addEventListener('click',()=>{const collapsed=node.classList.toggle('collapsed');node.querySelector('.item-collapse-toggle').setAttribute('aria-expanded',String(!collapsed));});
         node.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
           node.querySelectorAll('.tab,.pane').forEach(e => e.classList.remove('active'));
           tab.classList.add('active'); node.querySelector(`[data-pane="${tab.dataset.tab}"]`).classList.add('active');
@@ -672,6 +801,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         });
         refresh(); renderPhotos(node, item); return node;
       }
+      async function renderSectionPhotos(node,section){
+        const wrap=node.querySelector('.section-thumbs'),count=node.querySelector('.section-photo-count');wrap.replaceChildren();count.textContent=section.photos.length?`(${section.photos.length})`:'';
+        if(!section.photos.length){const empty=document.createElement('div');empty.className='empty-photos';empty.textContent='Aucune photo pour cette localisation';wrap.append(empty);return;}
+        for(const photoId of section.photos){const blob=await getPhoto(photoId);if(!blob)continue;const url=URL.createObjectURL(blob),tile=document.createElement('div'),open=document.createElement('a'),img=document.createElement('img'),remove=document.createElement('button');tile.className='thumb';open.className='thumb-open';open.href=`#photo-${photoId}`;open.setAttribute('aria-label','Agrandir la photo de la localisation');img.src=url;img.alt='Photo de la localisation';open.append(img);open.addEventListener('click',event=>{event.preventDefault();openViewer(url);});remove.className='thumb-remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','Supprimer la photo');remove.addEventListener('click',async()=>{if(!confirm('Supprimer cette photo ?'))return;await deletePhoto(photoId);section.photos=section.photos.filter(id=>id!==photoId);URL.revokeObjectURL(url);save();renderSectionPhotos(node,section);renderPhotoAppendix();});tile.append(open,remove);wrap.append(tile);}
+      }
       async function renderPhotos(node, item){
         const wrap = node.querySelector('.thumbs'); wrap.replaceChildren();
         node.querySelector('.photo-count').textContent = item.photos.length ? `(${item.photos.length})` : '';
@@ -690,8 +824,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       async function renderPhotoAppendix(){
         appendixObjectUrls.forEach(url=>URL.revokeObjectURL(url));appendixObjectUrls=[];
         const appendix=document.getElementById('photoAppendix');appendix.replaceChildren();
-        const entries=data.sections.flatMap(section=>section.items.flatMap(item=>item.photos.map((photoId,index)=>({photoId,index,item,section}))));
-        for(const entry of entries){const blob=await getPhoto(entry.photoId);if(!blob)continue;const sheet=document.createElement('article'),title=document.createElement('h2'),context=document.createElement('p'),img=document.createElement('img'),url=URL.createObjectURL(blob);appendixObjectUrls.push(url);sheet.className='photo-sheet';sheet.id=`photo-${entry.photoId}`;title.textContent=entry.item.equipment||'Équipement';context.textContent=[entry.section.name,entry.item.location,`Photo ${entry.index+1}`].filter(Boolean).join(' · ');img.src=url;img.alt=`${entry.item.equipment||'Équipement'} - photo ${entry.index+1}`;sheet.append(title,context,img);appendix.append(sheet);}
+        const entries=data.sections.flatMap(section=>[...section.photos.map((photoId,index)=>({photoId,index,section,item:null})),...section.items.flatMap(item=>item.photos.map((photoId,index)=>({photoId,index,item,section})))]);
+        for(const entry of entries){const blob=await getPhoto(entry.photoId);if(!blob)continue;const sheet=document.createElement('article'),title=document.createElement('h2'),context=document.createElement('p'),img=document.createElement('img'),url=URL.createObjectURL(blob),name=entry.item?.equipment||'Photo de la localisation';appendixObjectUrls.push(url);sheet.className=`photo-sheet${entry.item?' equipment-photo':''}`;sheet.id=`photo-${entry.photoId}`;if(entry.item){sheet.dataset.status=entry.item.status;sheet.style.setProperty('--photo-status-color',statusColor(entry.item.status));}title.textContent=name;context.textContent=[entry.section.name,entry.item?.location,entry.item&&statusLabel(entry.item.status),`Photo ${entry.index+1}`].filter(Boolean).join(' · ');img.src=url;img.alt=`${name} - photo ${entry.index+1}`;sheet.append(title,context,img);appendix.append(sheet);}
       }
       function openViewer(url){ const d = document.getElementById('photoViewer'); d.querySelector('img').src = url; d.showModal(); }
       async function renderCoverPhoto(){
@@ -731,12 +865,20 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const excelCol=index=>{let name='';for(let n=index+1;n;n=Math.floor((n-1)/26))name=String.fromCharCode(65+(n-1)%26)+name;return name;};
       function excelCell(row,index,value,style=0){return `<c r="${excelCol(index)}${row}" t="inlineStr"${style?` s="${style}"`:''}><is><t xml:space="preserve">${xmlEscape(value)}</t></is></c>`;}
       function equipmentSheetXml(){
-        const headers=['ID équipement','ID localisation','Localisation principale','Équipement','Quantité','Marque','Modèle','N° de série','Localisation précise','Remarque','Criticité'];
+        const headers=['ID équipement','ID localisation','Localisation','Équipement','Quantité','Marque','Modèle','N° de série','Localisation équipement','Remarque','Criticité'];
         const rows=[];data.sections.forEach(section=>section.items.forEach(item=>rows.push([item.id,section.id,section.name,item.equipment,item.quantity,item.brand,item.model,item.serialNumber,item.location,item.remark,statusLabel(item.status)])));
         const body=[`<row r="1" ht="28" customHeight="1">${headers.map((v,i)=>excelCell(1,i,v,1)).join('')}</row>`];
         rows.forEach((values,index)=>{const r=index+2;body.push(`<row r="${r}">${values.map((v,i)=>excelCell(r,i,v,3)).join('')}</row>`);});
         const last=Math.max(2,rows.length+1);
-        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="2" width="2" hidden="1" customWidth="1"/><col min="3" max="3" width="25" customWidth="1"/><col min="4" max="4" width="28" customWidth="1"/><col min="5" max="5" width="12" customWidth="1"/><col min="6" max="7" width="20" customWidth="1"/><col min="8" max="8" width="22" customWidth="1"/><col min="9" max="9" width="24" customWidth="1"/><col min="10" max="10" width="48" customWidth="1"/><col min="11" max="11" width="24" customWidth="1"/></cols><sheetData>${body.join('')}</sheetData><autoFilter ref="C1:K${last}"/><dataValidations count="1"><dataValidation type="list" allowBlank="0" showErrorMessage="1" sqref="K2:K1000"><formula1>"Élément satisfaisant,Point de vigilance,Solution requise"</formula1></dataValidation></dataValidations></worksheet>`;
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="2" width="2" hidden="1" customWidth="1"/><col min="3" max="3" width="25" customWidth="1"/><col min="4" max="4" width="28" customWidth="1"/><col min="5" max="5" width="12" customWidth="1"/><col min="6" max="7" width="20" customWidth="1"/><col min="8" max="8" width="22" customWidth="1"/><col min="9" max="9" width="28" customWidth="1"/><col min="10" max="10" width="48" customWidth="1"/><col min="11" max="11" width="24" customWidth="1"/></cols><sheetData>${body.join('')}</sheetData><autoFilter ref="C1:K${last}"/><dataValidations count="1"><dataValidation type="list" allowBlank="0" showErrorMessage="1" sqref="K2:K1000"><formula1>"Élément satisfaisant,Point de vigilance,Solution requise"</formula1></dataValidation></dataValidations></worksheet>`;
+      }
+      function locationsSheetXml(){
+        const headers=['ID localisation','Localisation','Remarque'];
+        const rows=data.sections.map(section=>[section.id,section.name,section.remark]);
+        const body=[`<row r="1" ht="28" customHeight="1">${headers.map((value,index)=>excelCell(1,index,value,2)).join('')}</row>`];
+        rows.forEach((values,index)=>{const r=index+2;body.push(`<row r="${r}">${values.map((value,column)=>excelCell(r,column,value,3)).join('')}</row>`);});
+        const last=Math.max(2,rows.length+1);
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="1" width="2" hidden="1" customWidth="1"/><col min="2" max="2" width="28" customWidth="1"/><col min="3" max="3" width="65" customWidth="1"/></cols><sheetData>${body.join('')}</sheetData><autoFilter ref="B1:C${last}"/></worksheet>`;
       }
       function reportSheetXml(){
         const agencyNames={marseille:'Marseille',aix:'Aix',cuers:'Cuers',nice:'Nice',nimes:'Nîmes'};
@@ -746,7 +888,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       function conformitySheetXml(){
         const headers=['ID localisation','Localisation','ID contrôle','Famille de vérification','Point à vérifier','Conformité','Remarques'];
         const labels={valid:'V - Validé',na:'Non concerné',invalid:'X - Non conforme'};
-        const rows=data.sections.filter(section=>section.name!=='EXTÉRIEUR').flatMap(section=>section.conformity.map(check=>[section.id,section.name,check.id,check.family,check.point,labels[check.status]||'',check.remark]));
+        const rows=data.sections.filter(section=>normalizeLocation(section.name)!=='EXTÉRIEUR').flatMap(section=>section.conformity.map(check=>[section.id,section.name,check.id,check.family,check.point,labels[check.status]||'',check.remark]));
         const body=[`<row r="1" ht="28" customHeight="1">${headers.map((value,index)=>excelCell(1,index,value,2)).join('')}</row>`];
         rows.forEach((values,index)=>{const r=index+2;body.push(`<row r="${r}">${values.map((value,column)=>excelCell(r,column,value,3)).join('')}</row>`);});
         const last=Math.max(2,rows.length+1);
@@ -754,20 +896,21 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       }
       async function collectExcelPhotos(){
         const photos=[];
-        if(data.coverPhotoData)photos.push({type:'chantier',itemId:'',photoId:'photo-chantier',order:0,category:'Couverture',equipment:data.projectName||'Chantier',location:'',encoded:data.coverPhotoData});
-        else if(data.coverPhoto){const blob=await getPhoto(data.coverPhoto);if(blob)photos.push({type:'chantier',itemId:'',photoId:data.coverPhoto,order:0,category:'Couverture',equipment:data.projectName||'Chantier',location:'',encoded:await blobToDataURL(blob)});}
-        for(const section of data.sections)for(const item of section.items)for(let index=0;index<item.photos.length;index++){const photoId=item.photos[index],blob=await getPhoto(photoId);if(blob)photos.push({type:'equipement',itemId:item.id,photoId,order:index,category:section.name,equipment:item.equipment,location:item.location,encoded:await blobToDataURL(blob)});}
+        if(data.coverPhotoData)photos.push({type:'chantier',itemId:'',photoId:'photo-chantier',order:0,category:'Couverture',equipment:data.projectName||'Chantier',itemLocation:'',encoded:data.coverPhotoData});
+        else if(data.coverPhoto){const blob=await getPhoto(data.coverPhoto);if(blob)photos.push({type:'chantier',itemId:'',photoId:data.coverPhoto,order:0,category:'Couverture',equipment:data.projectName||'Chantier',itemLocation:'',encoded:await blobToDataURL(blob)});}
+        for(const section of data.sections)for(let index=0;index<section.photos.length;index++){const photoId=section.photos[index],blob=await getPhoto(photoId);if(blob)photos.push({type:'localisation',itemId:section.id,photoId,order:index,category:section.name,equipment:'Localisation',itemLocation:'',encoded:await blobToDataURL(blob)});}
+        for(const section of data.sections)for(const item of section.items)for(let index=0;index<item.photos.length;index++){const photoId=item.photos[index],blob=await getPhoto(photoId);if(blob)photos.push({type:'equipement',itemId:item.id,photoId,order:index,category:section.name,equipment:item.equipment,itemLocation:item.location,encoded:await blobToDataURL(blob)});}
         return photos;
       }
       function photoDataSheetXml(photos){
-        const rows=[['Type','ID équipement','ID photo','Ordre','Partie','Donnée']],size=30000;
+        const rows=[['Type','ID cible','ID photo','Ordre','Partie','Donnée']],size=30000;
         photos.forEach(photo=>{const total=Math.ceil(photo.encoded.length/size);for(let part=0;part<total;part++)rows.push([photo.type,photo.itemId,photo.photoId,String(photo.order),String(part),photo.encoded.slice(part*size,(part+1)*size)]);});
         return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="6" width="14" hidden="1" customWidth="1"/></cols><sheetData>${rows.map((values,index)=>{const r=index+1;return `<row r="${r}">${values.map((v,i)=>excelCell(r,i,v,index===0?1:3)).join('')}</row>`;}).join('')}</sheetData></worksheet>`;
       }
       function visiblePhotosSheetXml(photos){
-        const header=['Localisation principale','Équipement','Localisation précise','Photo'];
+        const header=['Localisation','Équipement','Localisation équipement','Photo'];
         const rows=[`<row r="1" ht="28" customHeight="1">${header.map((v,i)=>excelCell(1,i,v,1)).join('')}</row>`];
-        photos.forEach((photo,index)=>{const r=index+2;rows.push(`<row r="${r}" ht="150" customHeight="1">${excelCell(r,0,photo.category,3)}${excelCell(r,1,photo.equipment,3)}${excelCell(r,2,photo.location,3)}${excelCell(r,3,`Photo ${photo.order+1}`,3)}</row>`);});
+        photos.forEach((photo,index)=>{const r=index+2;rows.push(`<row r="${r}" ht="150" customHeight="1">${excelCell(r,0,photo.category,3)}${excelCell(r,1,photo.equipment,3)}${excelCell(r,2,photo.itemLocation,3)}${excelCell(r,3,`Photo ${photo.order+1}`,3)}</row>`);});
         return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="1" width="25" customWidth="1"/><col min="2" max="2" width="28" customWidth="1"/><col min="3" max="3" width="25" customWidth="1"/><col min="4" max="4" width="44" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><drawing r:id="rId1"/></worksheet>`;
       }
       function photosDrawingXml(photos){
@@ -777,11 +920,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       async function exportExcel(){
         if(typeof JSZip==='undefined'){alert('Le module Excel n’a pas été chargé. Actualisez complètement la page.');return;}
         toast('Préparation du fichier Excel et des photos…');const photos=await collectExcelPhotos(),zip=new JSZip();
-        zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpg" ContentType="image/jpeg"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet4.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet5.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>');
+        zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpg" ContentType="image/jpeg"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet4.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet5.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet6.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>');
         zip.file('_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>');
-        zip.file('xl/workbook.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Equipements" sheetId="1" r:id="rId1"/><sheet name="Rapport" sheetId="2" r:id="rId2"/><sheet name="Photos" sheetId="3" r:id="rId3"/><sheet name="DonneesPhotos" sheetId="4" state="veryHidden" r:id="rId4"/><sheet name="Conformité" sheetId="5" r:id="rId5"/></sheets></workbook>');
-        zip.file('xl/_rels/workbook.xml.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet4.xml"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet5.xml"/><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
-        zip.file('xl/worksheets/sheet1.xml',equipmentSheetXml());zip.file('xl/worksheets/sheet2.xml',reportSheetXml());zip.file('xl/worksheets/sheet3.xml',visiblePhotosSheetXml(photos));zip.file('xl/worksheets/sheet4.xml',photoDataSheetXml(photos));zip.file('xl/worksheets/sheet5.xml',conformitySheetXml());
+        zip.file('xl/workbook.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Equipements" sheetId="1" r:id="rId1"/><sheet name="Rapport" sheetId="2" r:id="rId2"/><sheet name="Photos" sheetId="3" r:id="rId3"/><sheet name="DonneesPhotos" sheetId="4" state="veryHidden" r:id="rId4"/><sheet name="Conformité" sheetId="5" r:id="rId5"/><sheet name="Localisations" sheetId="6" r:id="rId6"/></sheets></workbook>');
+        zip.file('xl/_rels/workbook.xml.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet4.xml"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet5.xml"/><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet6.xml"/><Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
+        zip.file('xl/worksheets/sheet1.xml',equipmentSheetXml());zip.file('xl/worksheets/sheet2.xml',reportSheetXml());zip.file('xl/worksheets/sheet3.xml',visiblePhotosSheetXml(photos));zip.file('xl/worksheets/sheet4.xml',photoDataSheetXml(photos));zip.file('xl/worksheets/sheet5.xml',conformitySheetXml());zip.file('xl/worksheets/sheet6.xml',locationsSheetXml());
         zip.file('xl/worksheets/_rels/sheet3.xml.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/></Relationships>');
         zip.file('xl/drawings/drawing1.xml',photosDrawingXml(photos));
         zip.file('xl/drawings/_rels/drawing1.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${photos.map((photo,index)=>{const mime=(photo.encoded.match(/^data:([^;]+)/)||[])[1]||'image/jpeg',ext=mime.includes('png')?'png':'jpg';return `<Relationship Id="rId${index+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/photo-${index+1}.${ext}"/>`;}).join('')}</Relationships>`);
@@ -798,32 +941,35 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         const zip=await JSZip.loadAsync(file),shared=[];
         const sharedFile=zip.file('xl/sharedStrings.xml');if(sharedFile){const doc=parseXml(await sharedFile.async('string'));[...doc.getElementsByTagName('si')].forEach(si=>shared.push([...si.getElementsByTagName('t')].map(t=>t.textContent).join('')));}
         const readRows=async path=>{const entry=zip.file(path);if(!entry)throw new Error('Feuille Excel manquante');const doc=parseXml(await entry.async('string'));return [...doc.getElementsByTagName('row')].map(row=>{const values=[];[...row.getElementsByTagName('c')].forEach(cell=>{const ref=cell.getAttribute('r')||'',letters=(ref.match(/[A-Z]+/)||['A'])[0];let index=0;for(const char of letters)index=index*26+char.charCodeAt(0)-64;index--;const type=cell.getAttribute('t'),v=cell.getElementsByTagName('v')[0]?.textContent??'',inline=[...cell.getElementsByTagName('t')].map(t=>t.textContent).join('');values[index]=type==='s'?shared[Number(v)]??'':type==='inlineStr'?inline:v;});return values;});};
-        const rows=await readRows('xl/worksheets/sheet1.xml'),meta=await readRows('xl/worksheets/sheet2.xml'),photoRows=zip.file('xl/worksheets/sheet4.xml')?await readRows('xl/worksheets/sheet4.xml'):zip.file('xl/worksheets/sheet3.xml')?await readRows('xl/worksheets/sheet3.xml'):[],conformityRows=zip.file('xl/worksheets/sheet5.xml')?await readRows('xl/worksheets/sheet5.xml'):[],oldItems=new Map(data.sections.flatMap(section=>section.items.map(item=>[item.id,item]))),oldSections=new Map(data.sections.map(section=>[section.id,section])),sections=[],sectionMap=new Map();
-        const hasModel=String(rows[0]?.[6]||'').trim().toLowerCase()==='modèle';
+        const rows=await readRows('xl/worksheets/sheet1.xml'),meta=await readRows('xl/worksheets/sheet2.xml'),photoRows=zip.file('xl/worksheets/sheet4.xml')?await readRows('xl/worksheets/sheet4.xml'):zip.file('xl/worksheets/sheet3.xml')?await readRows('xl/worksheets/sheet3.xml'):[],conformityRows=zip.file('xl/worksheets/sheet5.xml')?await readRows('xl/worksheets/sheet5.xml'):[],locationRows=zip.file('xl/worksheets/sheet6.xml')?await readRows('xl/worksheets/sheet6.xml'):[],oldItems=new Map(data.sections.flatMap(section=>section.items.map(item=>[item.id,item]))),oldSections=new Map(data.sections.map(section=>[section.id,section])),sections=[],sectionMap=new Map();
+        const normalizeHeader=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+        const equipmentHeaders=new Map((rows[0]||[]).map((value,index)=>[normalizeHeader(value),index]));
+        const readEquipmentCell=(cells,...labels)=>{for(const label of labels){const index=equipmentHeaders.get(normalizeHeader(label));if(index!==undefined)return cells[index]??'';}return '';};
         rows.slice(1).forEach(values=>{
-          const cells=values.map(v=>v??'');let itemId,sectionId,sectionName,equipment,quantity,brand,model,serialNumber,location,remark,criticality;
-          if(hasModel)[itemId,sectionId,sectionName,equipment,quantity,brand,model,serialNumber,location,remark,criticality]=cells;
-          else{[itemId,sectionId,sectionName,equipment,quantity,brand,serialNumber,location,remark,criticality]=cells;model='';}
+          const cells=values.map(v=>v??''),itemId=readEquipmentCell(cells,'ID équipement'),sectionId=readEquipmentCell(cells,'ID localisation'),sectionName=readEquipmentCell(cells,'Localisation','Localisation principale'),equipment=readEquipmentCell(cells,'Équipement'),quantity=readEquipmentCell(cells,'Quantité'),brand=readEquipmentCell(cells,'Marque'),model=readEquipmentCell(cells,'Modèle'),serialNumber=readEquipmentCell(cells,'N° de série'),location=readEquipmentCell(cells,'Localisation équipement','Localisation précise'),remark=readEquipmentCell(cells,'Remarque'),criticality=readEquipmentCell(cells,'Criticité');
           if(!String(equipment).trim())return;const normalizedSection=normalizeLocation(sectionName),key=sectionId||`name:${normalizedSection}`;let section=sectionMap.get(key);
-          if(!section){section={id:sectionId||uid(),name:normalizedSection,items:[]};sectionMap.set(key,section);sections.push(section);}
+          if(!section){section={id:sectionId||uid(),name:normalizedSection,remark:'',photos:[],items:[]};sectionMap.set(key,section);sections.push(section);}
           const old=oldItems.get(itemId),statusText=String(criticality).toLowerCase(),status=statusText.includes('solution')?'solution':statusText.includes('vigilance')?'vigilance':'ok';
           section.items.push({id:itemId||uid(),equipment:String(equipment),quantity:String(quantity),brand:String(brand),model:String(model),serialNumber:String(serialNumber),location:String(location),remark:String(remark),status,photos:old?.photos||[]});
         });
-        if(!sections.length)throw new Error('Aucun équipement trouvé dans le fichier Excel');
-        sections.forEach(section=>{const old=oldSections.get(section.id),saved=new Map((old?.conformity||[]).map(check=>[check.id,check]));section.conformity=conformityChecklist.map(base=>{const previous=saved.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(previous.status)?previous.status:'',remark:String(previous.remark||'')};});});data.sections=sections;
+        if(locationRows.length>1){const headers=new Map((locationRows[0]||[]).map((value,index)=>[normalizeHeader(value),index]));const readLocation=(cells,...labels)=>{for(const label of labels){const index=headers.get(normalizeHeader(label));if(index!==undefined)return cells[index]??'';}return '';};locationRows.slice(1).forEach(values=>{const cells=values.map(value=>value??''),id=readLocation(cells,'ID localisation'),name=normalizeLocation(readLocation(cells,'Localisation')),remark=readLocation(cells,'Remarque'),key=id||`name:${name}`;if(!name&&!remark)return;let section=sectionMap.get(key)||sections.find(entry=>entry.id===id)||sections.find(entry=>entry.name===name);if(!section){section={id:id||uid(),name,remark:String(remark),photos:[],items:[]};sectionMap.set(key,section);sections.push(section);}else section.remark=String(remark);});}
+        if(!sections.length)throw new Error('Aucune localisation ni aucun équipement trouvé dans le fichier Excel');
+        sections.forEach(section=>{const old=oldSections.get(section.id),saved=new Map((old?.conformity||[]).map(check=>[check.id,check]));section.remark=String(section.remark||old?.remark||'');section.photos=[...(old?.photos||[])];section.conformity=conformityChecklist.map(base=>{const previous=saved.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(previous.status)?previous.status:'',remark:String(previous.remark||'')};});});data.sections=sections;
         if(photoRows.length>1){
-          const importedItems=new Map(sections.flatMap(section=>section.items.map(item=>[item.id,item]))),groups=new Map();sections.forEach(section=>section.items.forEach(item=>item.photos=[]));
+          const importedItems=new Map(sections.flatMap(section=>section.items.map(item=>[item.id,item]))),importedSections=new Map(sections.map(section=>[section.id,section])),groups=new Map();sections.forEach(section=>{section.photos=[];section.items.forEach(item=>item.photos=[]);});
           photoRows.slice(1).forEach(values=>{const [type,itemId,photoId,order,part,chunk]=values.map(v=>String(v??''));if(!chunk)return;const key=[type,itemId,photoId,order].join('|');if(!groups.has(key))groups.set(key,{type,itemId,photoId,order:Number(order)||0,parts:[]});groups.get(key).parts[Number(part)||0]=chunk;});
-          for(const photo of groups.values()){const encoded=photo.parts.join('');if(!encoded.startsWith('data:image/'))continue;if(photo.type==='chantier'){data.coverPhotoData=encoded;data.coverPhoto='';continue;}const item=importedItems.get(photo.itemId);if(!item)continue;const id=photo.photoId||uid();await putPhoto(id,dataUrlToBlob(encoded));item.photos[photo.order]=id;}
-          sections.forEach(section=>section.items.forEach(item=>item.photos=item.photos.filter(Boolean)));
+          for(const photo of groups.values()){const encoded=photo.parts.join('');if(!encoded.startsWith('data:image/'))continue;if(photo.type==='chantier'){data.coverPhotoData=encoded;data.coverPhoto='';continue;}const id=photo.photoId||uid();await putPhoto(id,dataUrlToBlob(encoded));if(photo.type==='localisation'){const section=importedSections.get(photo.itemId);if(section)section.photos[photo.order]=id;continue;}const item=importedItems.get(photo.itemId);if(item)item.photos[photo.order]=id;}
+          sections.forEach(section=>{section.photos=section.photos.filter(Boolean);section.items.forEach(item=>item.photos=item.photos.filter(Boolean));});
         }
         if(conformityRows.length>1){
           const parseStatus=value=>{const normalized=String(value||'').toLowerCase();return normalized.includes('non concern')?'na':normalized.includes('non conforme')||normalized.startsWith('x')?'invalid':normalized.includes('valid')||normalized.startsWith('v')?'valid':'';};
-          const legacy=String(conformityRows[0][0]||'').toLowerCase().includes('contrôle'),bySection=new Map(),byLocation=new Map(),legacyChecks=new Map();
+          const legacy=String(conformityRows[0][0]||'').toLowerCase().includes('contrôle'),specificConformityHeader=normalizeHeader(conformityRows[0][2]),hasSpecificConformity=specificConformityHeader==='nom specifique'||specificConformityHeader==='localisation specifique',bySection=new Map(),byLocation=new Map(),legacyChecks=new Map();
           conformityRows.slice(1).forEach(values=>{
             const cells=values.map(value=>String(value??''));
             if(legacy){const [id,family,point,status,remark]=cells;legacyChecks.set(id,{id,family,point,status:parseStatus(status),remark});return;}
-            const [sectionId,sectionName,id,family,point,status,remark]=cells,check={id,family,point,status:parseStatus(status),remark};
+            let sectionId,sectionName,id,family,point,status,remark;
+            if(hasSpecificConformity)[sectionId,sectionName,,id,family,point,status,remark]=cells;else [sectionId,sectionName,id,family,point,status,remark]=cells;
+            const check={id,family,point,status:parseStatus(status),remark};
             if(!bySection.has(sectionId))bySection.set(sectionId,new Map());bySection.get(sectionId).set(id,check);
             const location=normalizeLocation(sectionName);if(!byLocation.has(location))byLocation.set(location,new Map());byLocation.get(location).set(id,check);
           });
@@ -832,17 +978,18 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         const fields=Object.fromEntries(meta.slice(1).map(line=>[String(line[0]||'').trim(),String(line[1]||'').trim()]));data.projectName=fields['Nom du chantier']??data.projectName;let excelDate=fields['Date de visite']??data.visitDate;if(/^\d+(\.\d+)?$/.test(excelDate)){const date=new Date(Date.UTC(1899,11,30)+Number(excelDate)*86400000);excelDate=date.toISOString().slice(0,10);}data.visitDate=excelDate;data.technician=fields['Intervenant']??data.technician;const agencyByName={marseille:'marseille',aix:'aix',cuers:'cuers',nice:'nice','nîmes':'nimes',nimes:'nimes'};data.agency=agencyByName[(fields['Agence']||'').toLowerCase()]||data.agency;save();load();render();toast('Données et photos Excel réimportées');
       }
 
-      document.getElementById('projectName').addEventListener('input', e => { data.projectName=e.target.value; document.title = `${e.target.value || 'Rapport'} - Prise en charge`; save(); });
+      document.getElementById('projectName').addEventListener('input', e => { data.projectName=e.target.value;updateProjectNameDisplays();save(); });
       document.getElementById('coverPhotoInput').addEventListener('change', async e => { const file=e.target.files[0]; if(!file)return; try{const blob=await resizeImage(file,1200,.76), encoded=await blobToDataURL(blob), previous=data.coverPhoto; data.coverPhotoData=encoded;data.coverPhoto='';if(previous)await deletePhoto(previous);save();await renderCoverPhoto();toast('Photo du chantier ajoutée');}catch{toast('Impossible d’enregistrer cette photo');} e.target.value=''; });
       document.getElementById('coverPhotoOpen').addEventListener('click',()=>{if(coverObjectUrl)openViewer(coverObjectUrl);});
       document.getElementById('coverPhotoRemove').addEventListener('click',async()=>{if((!data.coverPhoto&&!data.coverPhotoData)||!confirm('Supprimer la photo du chantier ?'))return;if(data.coverPhoto)await deletePhoto(data.coverPhoto);data.coverPhoto='';data.coverPhotoData='';save();renderCoverPhoto();});
       document.getElementById('visitDate').addEventListener('input', e => { data.visitDate=e.target.value; save(); });
       document.getElementById('technician').addEventListener('input', e => { data.technician=e.target.value; save(); });
       document.getElementById('agencySelect').addEventListener('change', e => { data.agency=e.target.value; renderAgency(); save(); });
-      function addLocationSection(){ data.sections.push({id:uid(),name:'',items:[row()],conformity:clone(conformityChecklist)}); save(); render(); setTimeout(()=>{const input=document.querySelector('#sections .section:last-child .section-name-input'); input?.scrollIntoView({behavior:'smooth',block:'center'}); input?.focus();},20); }
+      function addLocationSection(){ data.sections.push({id:uid(),name:'',remark:'',photos:[],items:[row()],conformity:clone(conformityChecklist)}); save(); render(); setTimeout(()=>{const input=document.querySelector('#sections .section:last-child .section-name-input'); input?.scrollIntoView({behavior:'smooth',block:'center'}); input?.focus();},20); }
       document.getElementById('addYellowTab').addEventListener('click', addLocationSection);
       document.getElementById('printReport').addEventListener('click', async () => {
         document.activeElement?.blur();
+        updateProjectNameDisplays();
         await renderCoverPhoto();
         await renderPhotoAppendix();
         await Promise.all([...document.images].filter(img=>img.src).map(img=>img.complete ? img.decode?.().catch(()=>{}) : new Promise(resolve=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true});})));
@@ -851,6 +998,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           else alert('Ouvrez cette page dans Chrome ou Safari pour imprimer le PDF.');
         }, 180));
       });
+      window.addEventListener('beforeprint',updateProjectNameDisplays);
       document.getElementById('exportExcel').addEventListener('click', exportExcel);
       document.getElementById('importExcel').addEventListener('change', async event => {const file=event.target.files[0];if(!file)return;try{await importExcelFile(file);}catch(error){toast(error.message||'Import Excel impossible');}event.target.value='';});
       document.getElementById('resetReport').addEventListener('click', () => { if(!confirm('Réinitialiser toutes les saisies ? Les photos seront dissociées du rapport.')) return; data=clone(emptySeed); save(); load(); render(); toast('Rapport réinitialisé'); });
