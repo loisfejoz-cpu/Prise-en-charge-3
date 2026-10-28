@@ -680,6 +680,31 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         ['Entretien',"Etat général des compteurs d'eau, énergie…."],
         ['Entretien','Vannerie Etanches et Manoeuvrable']
       ].map(([family,point],index)=>({id:`controle-${index+1}`,family,point,status:'',remark:''}));
+      const chaufferieChecklist = conformityChecklist.filter((check,index)=>![1,8].includes(index)).map(check=>({...check}));
+      chaufferieChecklist.forEach(check=>{
+        if(check.family==='Accès')check.family='Accès chaufferie';
+        if(check.family==='Equipements')check.family='Equipements chaufferie';
+        const updates={
+          'controle-1':'Coupure électrique extérieure force et lumière',
+          'controle-3':'Repérage des coupures extérieures électrique et gaz',
+          'controle-4':'Etiquette "Chaufferie"',
+          'controle-8':'Présence de ferme porte automatique (groom)',
+          'controle-21':"Prise 220V avec différentiel 30mA dans l'armoire électrique et Coupure Extérieure",
+          'controle-41':"Présence d'appareil ou autre non dédié à la chaufferie"
+        };
+        if(updates[check.id])check.point=updates[check.id];
+        const hints={'controle-10':'Dimensions de la ventilation basse (en cm) : … × …','controle-11':'Dimensions de la ventilation haute (en cm) : … × …','controle-12':'Surface de la chaufferie (en m²) : …'};
+        check.remarkHint=hints[check.id]||'';
+        if(check.id==='controle-1')check.id='chaufferie-coupure-force-lumiere';
+        if(check.id==='controle-21')check.id='chaufferie-prise-220v';
+      });
+      chaufferieChecklist.splice(chaufferieChecklist.length-1,0,{id:'chaufferie-pompes-bruit',family:'Entretien',point:'Pompes, circulateurs réseaux: Absence de Bruits de Fonctionnement',status:'',remark:''});
+      function checklistForSection(section){return locationKind(section.name)==='CHAUFFERIE'?chaufferieChecklist:conformityChecklist;}
+      function syncSectionConformity(section){
+        const saved=new Map([...(section.conformityArchive||[]),...(section.conformity||[])].map(check=>[check.id,check]));
+        section.conformityArchive=[...saved.values()];
+        section.conformity=checklistForSection(section).map(base=>({...base,status:saved.get(base.id)?.status||'',remark:saved.get(base.id)?.remark||''}));
+      }
       const conformitySources = {
         boiler: {title:'Légifrance — Arrêté du 23 juin 1978 (chaufferies)',url:'https://www.legifrance.gouv.fr/loda/id/LEGITEXT000006074117'},
         electrical: {title:'INRS — L’électricité (ED 6345)',url:'https://www.inrs.fr/dam/jcr%3Aca3dc008-c0e8-4e95-9a82-b1377b990149/ed6345.pdf'},
@@ -844,7 +869,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         candidate.sections.forEach(s => {
           s.id ||= uid(); s.name = normalizeLocation(s.name); delete s.specificName; s.remark ??= ''; s.photos ||= []; s.items ||= []; s.collapsed=Boolean(s.collapsed);s.items.forEach(i => { i.id ||= uid(); i.photos ||= []; i.status ||= 'ok'; i.model ??= ''; i.location ??= ''; });
           const savedChecks=new Map((Array.isArray(s.conformity)?s.conformity:legacyChecks).map(check=>[check.id,check]));
-          s.conformity=conformityChecklist.map(base=>{const saved=savedChecks.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(saved.status)?saved.status:'',remark:String(saved.remark||'')};});
+          s.conformity=checklistForSection(s).map(base=>{const saved=savedChecks.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(saved.status)?saved.status:'',remark:String(saved.remark||'')};});
           s.hasConformity=true;
         });
         delete candidate.conformity;
@@ -914,7 +939,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           node.classList.toggle('collapsed',Boolean(section.collapsed));
           const sectionName = node.querySelector('.section-name-input'); sectionName.value = section.name;
           sectionName.addEventListener('input', () => { section.name = sectionName.value;save();renderSummary();renderPhotoAppendix(); });
-          sectionName.addEventListener('change',()=>{section.name=normalizeLocation(sectionName.value);sectionName.value=section.name;save();renderSummary();renderPhotoAppendix();});
+          sectionName.addEventListener('change',()=>{section.name=normalizeLocation(sectionName.value);sectionName.value=section.name;renderConformity(section,node);save();renderSummary();renderPhotoAppendix();});
           const sectionRemark=node.querySelector('.section-remark'),sectionRemarkPrint=node.querySelector('.section-remark-print');sectionRemark.value=section.remark||'';sectionRemarkPrint.textContent=section.remark||'';sectionRemark.addEventListener('input',()=>{section.remark=sectionRemark.value;sectionRemarkPrint.textContent=section.remark;save();});
           node.querySelectorAll('.section-tab').forEach(tab=>tab.addEventListener('click',()=>{node.querySelectorAll('.section-tab,.section-pane').forEach(element=>element.classList.remove('active'));tab.classList.add('active');node.querySelector(`[data-section-pane="${tab.dataset.sectionTab}"]`).classList.add('active');}));
           node.querySelector('.item-count').textContent = `${section.items.length} élément${section.items.length > 1 ? 's' : ''}`;
@@ -932,8 +957,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       }
       function renderConformity(section,node){
         const card=node.querySelector('.conformity-card'),toggle=node.querySelector('.conformity-title'),body=node.querySelector('.conformity-rows');body.replaceChildren();
-        section.hasConformity=true;card.hidden=false;
-        toggle.addEventListener('click',()=>{const collapsed=card.classList.toggle('collapsed');toggle.setAttribute('aria-expanded',String(!collapsed));});
+        syncSectionConformity(section);section.hasConformity=true;card.hidden=false;
+        toggle.onclick=()=>{const collapsed=card.classList.toggle('collapsed');toggle.setAttribute('aria-expanded',String(!collapsed));};
         section.conformity.forEach(check=>{
           const tr=document.createElement('tr'),family=document.createElement('td'),point=document.createElement('td'),statusCell=document.createElement('td'),remarkCell=document.createElement('td');
           family.dataset.label='Famille';point.dataset.label='Point à vérifier';statusCell.dataset.label='Conformité';remarkCell.dataset.label='Remarque';family.textContent=check.family;
@@ -943,8 +968,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           const statusPrint=document.createElement('span');statusPrint.className='print-field-value';
           const refreshStatusPrint=()=>{statusPrint.textContent=select.options[select.selectedIndex]?.textContent||'—';};
           const refreshRowStatus=()=>{tr.dataset.conformityStatus=select.value||'';};select.value=check.status;refreshStatusPrint();refreshRowStatus();select.addEventListener('change',()=>{check.status=select.value;select.dataset.value=select.value;refreshStatusPrint();refreshRowStatus();save();});
-          const remark=document.createElement('input'),remarkPrint=document.createElement('span');remark.className='conformity-remark';remark.type='text';remark.value=check.remark;remark.placeholder='Saisir une remarque';remark.setAttribute('aria-label',`Remarque : ${check.point}`);remarkPrint.className='print-field-value';remarkPrint.textContent=check.remark||'—';remark.addEventListener('input',()=>{check.remark=remark.value;remarkPrint.textContent=remark.value||'—';save();});
-          statusCell.append(select,statusPrint);remarkCell.append(remark,remarkPrint);tr.append(family,point,statusCell,remarkCell);body.append(tr);
+          const remark=document.createElement('input'),remarkPrint=document.createElement('span');remark.className='conformity-remark';remark.type='text';remark.value=check.remark;remark.placeholder=check.remarkHint||'Saisir une remarque';remark.setAttribute('aria-label',`Remarque : ${check.point}`);remarkPrint.className='print-field-value';remarkPrint.textContent=check.remark||'—';remark.addEventListener('input',()=>{check.remark=remark.value;remarkPrint.textContent=remark.value||'—';save();});
+          statusCell.append(select,statusPrint);remarkCell.append(remark,remarkPrint);if(check.remarkHint){const hint=document.createElement('div');hint.className='photo-help';hint.textContent=check.remarkHint;remarkCell.append(hint);}tr.append(family,point,statusCell,remarkCell);body.append(tr);
         });
       }
       function renderItem(section, item){
@@ -1203,7 +1228,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         });
         if(locationRows.length>1){const headers=new Map((locationRows[0]||[]).map((value,index)=>[normalizeHeader(value),index]));const readLocation=(cells,...labels)=>{for(const label of labels){const index=headers.get(normalizeHeader(label));if(index!==undefined)return cells[index]??'';}return '';};locationRows.slice(1).forEach(values=>{const cells=values.map(value=>value??''),id=readLocation(cells,'ID localisation'),name=normalizeLocation(readLocation(cells,'Localisation')),remark=readLocation(cells,'Remarque'),hasConformity=true,key=id||`name:${name}`;if(!name&&!remark)return;let section=sectionMap.get(key)||sections.find(entry=>entry.id===id)||sections.find(entry=>entry.name===name);if(!section){section={id:id||uid(),name,remark:String(remark),photos:[],items:[],hasConformity,collapsed:false};sectionMap.set(key,section);sections.push(section);}else{section.remark=String(remark);section.hasConformity=hasConformity;}});}
         if(!sections.length)throw new Error('Aucune localisation ni aucun équipement trouvé dans le fichier Excel');
-        sections.forEach(section=>{const old=oldSections.get(section.id),saved=new Map((old?.conformity||[]).map(check=>[check.id,check]));section.remark=String(section.remark||old?.remark||'');section.photos=[...(old?.photos||[])];section.collapsed=Boolean(old?.collapsed);section.hasConformity=true;section.conformity=conformityChecklist.map(base=>{const previous=saved.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(previous.status)?previous.status:'',remark:String(previous.remark||'')};});});data.sections=sections;
+        sections.forEach(section=>{const old=oldSections.get(section.id),saved=new Map((old?.conformity||[]).map(check=>[check.id,check]));section.remark=String(section.remark||old?.remark||'');section.photos=[...(old?.photos||[])];section.collapsed=Boolean(old?.collapsed);section.hasConformity=true;section.conformity=checklistForSection(section).map(base=>{const previous=saved.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(previous.status)?previous.status:'',remark:String(previous.remark||'')};});});data.sections=sections;
         if(photoRows.length>1){
           const importedItems=new Map(sections.flatMap(section=>section.items.map(item=>[item.id,item]))),importedSections=new Map(sections.map(section=>[section.id,section])),groups=new Map();sections.forEach(section=>{section.photos=[];section.items.forEach(item=>item.photos=[]);});
           photoRows.slice(1).forEach(values=>{const [type,itemId,photoId,order,part,chunk]=values.map(v=>String(v??''));if(!chunk)return;const key=[type,itemId,photoId,order].join('|');if(!groups.has(key))groups.set(key,{type,itemId,photoId,order:Number(order)||0,parts:[]});groups.get(key).parts[Number(part)||0]=chunk;});
@@ -1222,7 +1247,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             if(!bySection.has(sectionId))bySection.set(sectionId,new Map());bySection.get(sectionId).set(id,check);
             const location=normalizeLocation(sectionName);if(!byLocation.has(location))byLocation.set(location,new Map());byLocation.get(location).set(id,check);
           });
-          sections.forEach(section=>{const imported=bySection.get(section.id)||byLocation.get(section.name)||(legacyChecks.size?legacyChecks:null);if(!imported)return;section.hasConformity=true;section.conformity=conformityChecklist.map(base=>{const saved=imported.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(saved.status)?saved.status:'',remark:String(saved.remark||'')};});});
+          sections.forEach(section=>{const imported=bySection.get(section.id)||byLocation.get(section.name)||(legacyChecks.size?legacyChecks:null);if(!imported)return;section.hasConformity=true;section.conformity=checklistForSection(section).map(base=>{const saved=imported.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(saved.status)?saved.status:'',remark:String(saved.remark||'')};});});
         }
         const fields=Object.fromEntries(meta.slice(1).map(line=>[String(line[0]||'').trim(),String(line[1]||'').trim()]));data.reportTitle=fields['Titre du rapport']??data.reportTitle;data.projectName=fields['Nom du chantier']??data.projectName;data.regulatoryText=fields['Texte réglementaire']??data.regulatoryText;let excelDate=fields['Date de visite']??data.visitDate;if(/^\d+(\.\d+)?$/.test(excelDate)){const date=new Date(Date.UTC(1899,11,30)+Number(excelDate)*86400000);excelDate=date.toISOString().slice(0,10);}data.visitDate=excelDate;data.technician=fields['Intervenant']??data.technician;const agencyByName={marseille:'marseille',aix:'aix',cuers:'cuers',nice:'nice','nîmes':'nimes',nimes:'nimes'};data.agency=agencyByName[(fields['Agence']||'').toLowerCase()]||data.agency;save();load();render();toast('Données et photos Excel réimportées');
       }
