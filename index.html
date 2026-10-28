@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#148a49">
   <title>Rapport de prise en charge</title>
+  <meta name="app-version" content="conformite-46-v2">
   <style>
     :root {
       --green: #0cb358;
@@ -544,7 +545,7 @@
         <section class="conformity-card">
           <button class="conformity-title" type="button" aria-expanded="true"><strong>CONFORMITÉ</strong><span class="chevron" aria-hidden="true">⌄</span></button>
           <div class="conformity-content">
-            <p class="conformity-help">Contrôles propres à cette localisation. Touchez une case pour choisir V validé, Non concerné ou ✕.</p>
+            <p class="conformity-help">Grille mise à jour — 46 contrôles. Touchez une case pour choisir V validé, Non concerné ou ✕.</p>
             <div class="conformity-table-wrap"><table class="conformity-table"><thead><tr><th>Famille de vérification</th><th>Point à vérifier</th><th>Conformité</th><th>Remarques</th></tr></thead><tbody class="conformity-rows"></tbody></table></div>
           </div>
         </section>
@@ -699,7 +700,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         if(check.id==='controle-21')check.id='chaufferie-prise-220v';
       });
       chaufferieChecklist.splice(chaufferieChecklist.length-1,0,{id:'chaufferie-pompes-bruit',family:'Entretien',point:'Pompes, circulateurs réseaux: Absence de Bruits de Fonctionnement',status:'',remark:''});
-      function checklistForSection(section){return locationKind(section.name)==='CHAUFFERIE'?chaufferieChecklist:conformityChecklist;}
+      function checklistForSection(section){return chaufferieChecklist;}
       function syncSectionConformity(section){
         const saved=new Map([...(section.conformityArchive||[]),...(section.conformity||[])].map(check=>[check.id,check]));
         section.conformityArchive=[...saved.values()];
@@ -842,7 +843,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             row('Dalle de sol','ENS','','TOITURE / PATIO','','ok') ] }
         ]
       };
-      const emptySeed = { reportTitle: 'Rapport de prise en charge', regulatoryText: '', projectName: '', coverPhoto: '', coverPhotoData: '', agency: 'marseille', visitDate: '', technician: '', sections: [{ id: uid(), name: '', remark: '', photos: [], items: [row()], conformity: clone(conformityChecklist), hasConformity:true, collapsed: false }] };
+      const emptySeed = { reportTitle: 'Rapport de prise en charge', regulatoryText: '', projectName: '', coverPhoto: '', coverPhotoData: '', agency: 'marseille', visitDate: '', technician: '', sections: [{ id: uid(), name: '', remark: '', photos: [], items: [row()], conformity: clone(chaufferieChecklist), hasConformity:true, collapsed: false }] };
       const suggestions = {
         equipment: equipmentCatalog,
         quantity: [], brand: [], location: []
@@ -1261,7 +1262,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       document.getElementById('visitDate').addEventListener('input', e => { data.visitDate=e.target.value; save(); });
       document.getElementById('technician').addEventListener('input', e => { data.technician=e.target.value; save(); });
       document.getElementById('agencySelect').addEventListener('change', e => { data.agency=e.target.value; renderAgency(); save(); });
-      function addLocationSection(){ data.sections.push({id:uid(),name:'',remark:'',photos:[],items:[row()],conformity:clone(conformityChecklist),hasConformity:true,collapsed:false}); save(); render(); setTimeout(()=>{const input=document.querySelector('#sections .section:last-child .section-name-input'); input?.scrollIntoView({behavior:'smooth',block:'center'}); input?.focus();},20); }
+      function addLocationSection(){ data.sections.push({id:uid(),name:'',remark:'',photos:[],items:[row()],conformity:clone(chaufferieChecklist),hasConformity:true,collapsed:false}); save(); render(); setTimeout(()=>{const input=document.querySelector('#sections .section:last-child .section-name-input'); input?.scrollIntoView({behavior:'smooth',block:'center'}); input?.focus();},20); }
       document.getElementById('addYellowTab').addEventListener('click', addLocationSection);
       document.getElementById('printReport').addEventListener('click', async () => {
         document.activeElement?.blur();
