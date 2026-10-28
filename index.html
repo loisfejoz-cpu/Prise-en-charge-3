@@ -458,16 +458,16 @@
   <nav class="toolbar" aria-label="Actions du rapport">
     <div class="page" style="display:flex;gap:8px">
       <button class="btn" id="printReport" type="button">Imprimer / PDF</button>
-      <button class="btn" id="exportWord" type="button">Exporter Word</button>
+      
       <button class="btn" id="exportExcel" type="button">Exporter Excel</button>
       <label class="btn" for="importExcel">Importer Excel<input id="importExcel" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden></label>
       <button class="btn danger" id="resetReport" type="button">Réinitialiser</button>
     </div>
   </nav>
 
-  <section class="regulatory-editor page" aria-labelledby="regulatoryEditorTitle">
+  <section hidden class="regulatory-editor page" aria-labelledby="regulatoryEditorTitle">
     <h2 id="regulatoryEditorTitle">Texte réglementaire</h2>
-    <p>Facultatif : s’il est renseigné, ce texte occupera seul la deuxième page du PDF et du document Word.</p>
+    <p>Texte réglementaire conservé dans les données du rapport.</p>
     <textarea id="regulatoryText" placeholder="Saisir ou coller ici le texte réglementaire…"></textarea>
   </section>
 
@@ -532,7 +532,7 @@
     <section class="section">
       <div class="section-title"><span class="section-location-label">LOCALISATION</span><input class="section-name-input" list="locationSuggestions" type="text" aria-label="Type de localisation" placeholder="Choisir ou saisir"><button class="section-toggle" type="button" aria-label="Replier ou déplier"><small class="item-count"></small> <span class="chevron">⌄</span></button></div>
       <div class="section-content">
-        <div class="section-actions"><button class="btn add-conformity" type="button">＋ Ajouter l’onglet conformité</button><button class="btn danger delete-section" type="button">Supprimer la localisation</button></div>
+        <div class="section-actions"><button class="btn danger delete-section" type="button">Supprimer la localisation</button></div>
         <div class="section-tabs" role="tablist">
           <button class="section-tab active" data-section-tab="equipment" type="button">Équipements</button>
           <button class="section-tab" data-section-tab="remark" type="button">Remarque</button>
@@ -544,7 +544,6 @@
         <section class="conformity-card">
           <button class="conformity-title" type="button" aria-expanded="true"><strong>CONFORMITÉ</strong><span class="chevron" aria-hidden="true">⌄</span></button>
           <div class="conformity-content">
-            <div class="conformity-actions"><button class="delete-conformity" type="button">Supprimer cette conformité</button></div>
             <p class="conformity-help">Contrôles propres à cette localisation. Touchez une case pour choisir V validé, Non concerné ou ✕.</p>
             <div class="conformity-table-wrap"><table class="conformity-table"><thead><tr><th>Famille de vérification</th><th>Point à vérifier</th><th>Conformité</th><th>Remarques</th></tr></thead><tbody class="conformity-rows"></tbody></table></div>
           </div>
@@ -818,7 +817,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             row('Dalle de sol','ENS','','TOITURE / PATIO','','ok') ] }
         ]
       };
-      const emptySeed = { reportTitle: 'Rapport de prise en charge', regulatoryText: '', projectName: '', coverPhoto: '', coverPhotoData: '', agency: 'marseille', visitDate: '', technician: '', sections: [{ id: uid(), name: '', remark: '', photos: [], items: [row()], conformity: clone(conformityChecklist), hasConformity: false, collapsed: false }] };
+      const emptySeed = { reportTitle: 'Rapport de prise en charge', regulatoryText: '', projectName: '', coverPhoto: '', coverPhotoData: '', agency: 'marseille', visitDate: '', technician: '', sections: [{ id: uid(), name: '', remark: '', photos: [], items: [row()], conformity: clone(conformityChecklist), hasConformity:true, collapsed: false }] };
       const suggestions = {
         equipment: equipmentCatalog,
         quantity: [], brand: [], location: []
@@ -846,7 +845,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           s.id ||= uid(); s.name = normalizeLocation(s.name); delete s.specificName; s.remark ??= ''; s.photos ||= []; s.items ||= []; s.collapsed=Boolean(s.collapsed);s.items.forEach(i => { i.id ||= uid(); i.photos ||= []; i.status ||= 'ok'; i.model ??= ''; i.location ??= ''; });
           const savedChecks=new Map((Array.isArray(s.conformity)?s.conformity:legacyChecks).map(check=>[check.id,check]));
           s.conformity=conformityChecklist.map(base=>{const saved=savedChecks.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(saved.status)?saved.status:'',remark:String(saved.remark||'')};});
-          if(typeof s.hasConformity!=='boolean')s.hasConformity=s.conformity.some(check=>check.status||check.remark);
+          s.hasConformity=true;
         });
         delete candidate.conformity;
         return candidate;
@@ -876,7 +875,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       function updateProjectNameDisplays(){
         const name=data.projectName||'Rapport de prise en charge',reportTitle=data.reportTitle||'Rapport de prise en charge',regulatoryText=String(data.regulatoryText||'').trim(),cssName=name.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/[\r\n]+/g,' ');
         document.getElementById('projectNamePrint').textContent=name;document.getElementById('reportTitlePrint').textContent=reportTitle;document.getElementById('printProjectFooter').textContent=name;document.documentElement.style.setProperty('--print-project-name',`"${cssName}"`);document.title=`${name} - ${reportTitle}`;
-        const regulatoryPage=document.getElementById('regulatoryPrintPage'),regulatoryContent=document.getElementById('regulatoryPrintContent');regulatoryPage.hidden=!regulatoryText;regulatoryContent.textContent=regulatoryText;regulatoryContent.style.fontSize=regulatoryText.length>8000?'7pt':regulatoryText.length>6000?'8pt':regulatoryText.length>4000?'9pt':regulatoryText.length>2500?'10pt':'11pt';
+        const regulatoryPage=document.getElementById('regulatoryPrintPage'),regulatoryContent=document.getElementById('regulatoryPrintContent');regulatoryPage.hidden=true;regulatoryContent.textContent=regulatoryText;regulatoryContent.style.fontSize=regulatoryText.length>8000?'7pt':regulatoryText.length>6000?'8pt':regulatoryText.length>4000?'9pt':regulatoryText.length>2500?'10pt':'11pt';
       }
       function load(){
         try { const saved = localStorage.getItem(STORAGE_KEY); data = saved ? cleanData(JSON.parse(saved)) : clone(emptySeed); }
@@ -914,7 +913,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           node.dataset.sectionId = section.id;
           node.classList.toggle('collapsed',Boolean(section.collapsed));
           const sectionName = node.querySelector('.section-name-input'); sectionName.value = section.name;
-          sectionName.addEventListener('input', () => { section.name = sectionName.value;const exterior=locationKind(section.name)==='EXTÉRIEUR';node.querySelector('.conformity-card').hidden=!section.hasConformity||exterior;node.querySelector('.add-conformity').hidden=Boolean(section.hasConformity)||exterior;save();renderSummary();renderPhotoAppendix(); });
+          sectionName.addEventListener('input', () => { section.name = sectionName.value;save();renderSummary();renderPhotoAppendix(); });
           sectionName.addEventListener('change',()=>{section.name=normalizeLocation(sectionName.value);sectionName.value=section.name;save();renderSummary();renderPhotoAppendix();});
           const sectionRemark=node.querySelector('.section-remark'),sectionRemarkPrint=node.querySelector('.section-remark-print');sectionRemark.value=section.remark||'';sectionRemarkPrint.textContent=section.remark||'';sectionRemark.addEventListener('input',()=>{section.remark=sectionRemark.value;sectionRemarkPrint.textContent=section.remark;save();});
           node.querySelectorAll('.section-tab').forEach(tab=>tab.addEventListener('click',()=>{node.querySelectorAll('.section-tab,.section-pane').forEach(element=>element.classList.remove('active'));tab.classList.add('active');node.querySelector(`[data-section-pane="${tab.dataset.sectionTab}"]`).classList.add('active');}));
@@ -922,7 +921,6 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           const sectionToggle=node.querySelector('.section-toggle');sectionToggle.setAttribute('aria-expanded',String(!section.collapsed));sectionToggle.addEventListener('click', () => {section.collapsed=node.classList.toggle('collapsed');sectionToggle.setAttribute('aria-expanded',String(!section.collapsed));save();});
           const list = node.querySelector('.items'); section.items.forEach(item => list.append(renderItem(section, item)));
           node.querySelector('.add-row').addEventListener('click', () => { section.items.push(row()); save(); render(); setTimeout(() => host.querySelector(`[data-section-id="${section.id}"] .item:last-child`)?.scrollIntoView({behavior:'smooth',block:'center'}), 20); });
-          const addConformity=node.querySelector('.add-conformity');addConformity.hidden=Boolean(section.hasConformity)||locationKind(section.name)==='EXTÉRIEUR';addConformity.addEventListener('click',()=>{section.hasConformity=true;save();render();setTimeout(()=>document.querySelector(`[data-section-id="${section.id}"] .conformity-card`)?.scrollIntoView({behavior:'smooth',block:'start'}),20);});
           node.querySelector('.delete-section').addEventListener('click',async()=>{if(!confirm(`Supprimer la localisation « ${section.name||'sans nom'} » et tous ses équipements ?`))return;const photoIds=[...section.photos,...section.items.flatMap(item=>item.photos||[])];for(const photoId of photoIds)await deletePhoto(photoId);data.sections=data.sections.filter(entry=>entry.id!==section.id);save();render();toast('Localisation supprimée');});
           const addSectionPhotos=async event=>{const files=[...event.target.files];for(const file of files){try{const blob=await resizeImage(file,1800,.82),photoId=uid();await putPhoto(photoId,blob);section.photos.push(photoId);}catch{toast('Impossible d’enregistrer cette photo');}}event.target.value='';if(files.length){save();renderSectionPhotos(node,section);renderPhotoAppendix();}};node.querySelectorAll('.section-photo-input,.section-gallery-input').forEach(input=>input.addEventListener('change',addSectionPhotos));
           renderSectionPhotos(node,section);
@@ -934,9 +932,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       }
       function renderConformity(section,node){
         const card=node.querySelector('.conformity-card'),toggle=node.querySelector('.conformity-title'),body=node.querySelector('.conformity-rows');body.replaceChildren();
-        card.hidden=!section.hasConformity||locationKind(section.name)==='EXTÉRIEUR';if(card.hidden)return;
+        section.hasConformity=true;card.hidden=false;
         toggle.addEventListener('click',()=>{const collapsed=card.classList.toggle('collapsed');toggle.setAttribute('aria-expanded',String(!collapsed));});
-        node.querySelector('.delete-conformity').addEventListener('click',()=>{if(!confirm(`Supprimer le tableau de conformité de « ${section.name||'cette localisation'} » ? Les réponses saisies seront effacées.`))return;section.hasConformity=false;section.conformity=clone(conformityChecklist);save();render();toast('Conformité supprimée');});
         section.conformity.forEach(check=>{
           const tr=document.createElement('tr'),family=document.createElement('td'),point=document.createElement('td'),statusCell=document.createElement('td'),remarkCell=document.createElement('td');
           family.dataset.label='Famille';point.dataset.label='Point à vérifier';statusCell.dataset.label='Conformité';remarkCell.dataset.label='Remarque';family.textContent=check.family;
@@ -1087,7 +1084,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       function conformitySheetXml(){
         const headers=['ID localisation','Localisation','ID contrôle','Famille de vérification','Point à vérifier','Conformité','Remarques'];
         const labels={valid:'V - Validé',na:'Non concerné',invalid:'X - Non conforme'};
-        const rows=data.sections.filter(section=>section.hasConformity&&locationKind(section.name)!=='EXTÉRIEUR').flatMap(section=>section.conformity.map(check=>[section.id,section.name,check.id,check.family,check.point,labels[check.status]||'',check.remark]));
+        const rows=data.sections.flatMap(section=>section.conformity.map(check=>[section.id,section.name,check.id,check.family,check.point,labels[check.status]||'',check.remark]));
         const body=[`<row r="1" ht="28" customHeight="1">${headers.map((value,index)=>excelCell(1,index,value,2)).join('')}</row>`];
         rows.forEach((values,index)=>{const r=index+2;body.push(`<row r="${r}">${values.map((value,column)=>excelCell(r,column,value,3)).join('')}</row>`);});
         const last=Math.max(2,rows.length+1);
@@ -1186,58 +1183,6 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         return new Promise(resolve=>{const image=new Image();image.onload=()=>{const maxWidth=5450000,maxHeight=6200000,ratio=Math.min(maxWidth/image.naturalWidth,maxHeight/image.naturalHeight);resolve({cx:Math.round(image.naturalWidth*ratio),cy:Math.round(image.naturalHeight*ratio)});};image.onerror=()=>resolve({cx:5000000,cy:3300000});image.src=encoded;});
       }
       function wordImageDrawing(relId,id,name,cx,cy,borderColor=''){const line=borderColor?`<a:ln w="52000"><a:solidFill><a:srgbClr val="${borderColor}"/></a:solidFill><a:prstDash val="solid"/></a:ln>`:'';return `<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:after="120"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="${id}" name="${xmlEscape(name)}" descr="${xmlEscape(name)}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${id}" name="${xmlEscape(name)}" descr="${xmlEscape(name)}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${relId}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>${line}</pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;}
-      async function exportWord(){
-        if(typeof JSZip==='undefined'){alert('Le module Word n’a pas été chargé. Actualisez complètement la page.');return;}
-        toast('Préparation du document Word…');
-        const photos=await collectExcelPhotos(),zip=new JSZip(),relationships=[],media=[],documentParts=[],project=data.projectName||'Chantier',agency=agencies[data.agency]||agencies.marseille;
-        documentParts.push(wordParagraph('SOGITEC','',{bold:true,color:'27A956',size:40,underline:true,spaceAfter:620}));
-        documentParts.push(wordParagraph(data.reportTitle||'Rapport de prise en charge','Title',{color:'087A3E',bold:true,size:34,spaceAfter:90}));
-        documentParts.push(wordParagraph(project,'Subtitle',{bold:true,size:29,spaceAfter:240}));
-        documentParts.push(`<w:tbl><w:tblPr><w:tblW w:w="9000" w:type="dxa"/><w:tblLayout w:type="fixed"/>${wordBorders}</w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid><w:tr><w:trPr><w:cantSplit/></w:trPr>${wordField('Date de visite',data.visitDate||'—',4500)}${wordField('Intervenant',data.technician||'—',4500)}</w:tr></w:tbl>${wordParagraph('', '', {spaceAfter:170})}`);
-        const cover=photos.find(photo=>photo.type==='chantier');
-        if(cover){const mime=(cover.encoded.match(/^data:([^;]+)/)||[])[1]||'image/jpeg',ext=mime.includes('png')?'png':'jpg',relId='rId3',dimensions=await wordImageDimensions(cover.encoded);relationships.push({id:relId,target:`media/photo-cover.${ext}`});media.push({path:`word/media/photo-cover.${ext}`,base64:cover.encoded.split(',')[1]||''});documentParts.push(wordImageDrawing(relId,1,'Photo du chantier',dimensions.cx,Math.min(dimensions.cy,4400000)));}
-        documentParts.push(wordParagraph(agency[0]||'SOGITEC','',{bold:true,color:'087A3E',size:18,spaceBefore:180,spaceAfter:30}));
-        documentParts.push(wordParagraph(agency.slice(1).join('\n'),'',{size:16,spaceAfter:0}));
-        documentParts.push(wordPageBreak());
-        if(String(data.regulatoryText||'').trim()){
-          documentParts.push(wordParagraph('SOGITEC','',{bold:true,color:'27A956',size:34,underline:true,spaceAfter:500}));
-          documentParts.push(wordParagraph('Texte réglementaire','Heading1',{color:'087A3E',size:28,spaceAfter:220}));
-          documentParts.push(wordTextBlock(data.regulatoryText));
-          documentParts.push(wordPageBreak());
-        }
-        documentParts.push(wordParagraph('État des lieux et prise en charge','Heading1',{color:'087A3E',size:28,spaceAfter:90}));
-        documentParts.push(wordParagraph('Pour chaque équipement, la criticité est indiquée par la couleur du bloc.','',{color:'536159',size:17,spaceAfter:180}));
-        for(const section of data.sections){
-          documentParts.push(wordSectionBanner(section.name||'Localisation'));
-          if(section.remark)documentParts.push(wordParagraph('REMARQUE DE LA LOCALISATION','',{bold:true,color:'536159',size:14,spaceAfter:30,keepNext:true}),wordParagraph(section.remark,'',{size:18,spaceAfter:130}));
-          section.items.forEach(item=>documentParts.push(wordEquipmentCard(item)));
-          if(section.hasConformity&&locationKind(section.name)!=='EXTÉRIEUR'){
-            documentParts.push(wordParagraph('Conformité','Heading2',{color:'087A3E',size:22,spaceBefore:60,spaceAfter:80,keepNext:true}));
-            documentParts.push(wordConformityTable(section.conformity));
-          }
-        }
-        const summaryRows=data.sections.flatMap(section=>section.items.map(item=>[item.equipment,item.location||section.name,statusLabel(item.status)]));
-        documentParts.push(wordParagraph('Synthèse','Heading1',{pageBreakBefore:true,color:'087A3E',size:28,spaceAfter:160}));
-        documentParts.push(wordSummaryTable(summaryRows));
-        const chart=wordCriticalityChart();if(chart){const relId=`rId${relationships.length+3}`;relationships.push({id:relId,target:'media/criticite.png'});media.push({path:'word/media/criticite.png',base64:chart.split(',')[1]||''});documentParts.push(wordImageDrawing(relId,99,'Répartition des équipements par criticité',4800000,2240000));}
-        const appendixPhotos=photos.filter(photo=>photo.type!=='chantier');
-        if(appendixPhotos.length){documentParts.push(wordParagraph('Annexe photographique','Heading1',{pageBreakBefore:true,color:'087A3E',size:28,spaceAfter:180}));}
-        let imageId=2;
-        for(let index=0;index<appendixPhotos.length;index++){
-          const photo=appendixPhotos[index],item=data.sections.flatMap(section=>section.items).find(entry=>entry.id===photo.itemId),mime=(photo.encoded.match(/^data:([^;]+)/)||[])[1]||'image/jpeg',ext=mime.includes('png')?'png':'jpg',relId=`rId${relationships.length+3}`,dimensions=await wordImageDimensions(photo.encoded),name=`${photo.equipment||'Localisation'} - Photo ${photo.order+1}`,details=[photo.category,item?.brand&&`Marque : ${item.brand}`,item?.model&&`Modèle : ${item.model}`,item?.serialNumber&&`N° de série : ${item.serialNumber}`,photo.itemLocation&&`Localisation : ${photo.itemLocation}`,item&&statusLabel(item.status)].filter(Boolean).join(' · '),border=item?(item.status==='solution'?'E32626':item.status==='vigilance'?'F2B600':'0CB358'):'087A3E';
-          relationships.push({id:relId,target:`media/photo-${index+1}.${ext}`});media.push({path:`word/media/photo-${index+1}.${ext}`,base64:photo.encoded.split(',')[1]||''});documentParts.push(wordParagraph(name,'Heading2',{color:'087A3E',center:true,size:22,spaceAfter:60,keepNext:true}),wordParagraph(details,'',{center:true,color:'536159',size:16,spaceAfter:110,keepNext:true}));documentParts.push(wordImageDrawing(relId,imageId++,name,dimensions.cx,dimensions.cy,border));if(index<appendixPhotos.length-1)documentParts.push(wordPageBreak());
-        }
-        const documentXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${documentParts.join('')}<w:sectPr><w:footerReference w:type="default" r:id="rId2"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="900" w:right="900" w:bottom="950" w:left="900" w:header="400" w:footer="400" w:gutter="0"/></w:sectPr></w:body></w:document>`;
-        const stylesXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/><w:color w:val="000000"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:jc w:val="center"/></w:pPr><w:rPr><w:b/><w:color w:val="000000"/><w:sz w:val="34"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Subtitle"><w:name w:val="Subtitle"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:rPr><w:b/><w:color w:val="000000"/><w:sz w:val="28"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:color w:val="000000"/><w:sz w:val="28"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:b/><w:color w:val="000000"/><w:sz w:val="24"/></w:rPr></w:style></w:styles>`;
-        zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpg" ContentType="image/jpeg"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>');
-        zip.file('_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>');
-        const footerXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:tbl><w:tblPr><w:tblW w:w="9000" w:type="dxa"/><w:tblBorders><w:top w:val="single" w:sz="8" w:color="087A3E"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="7200"/><w:gridCol w:w="1800"/></w:tblGrid><w:tr>${wordCell(project,{width:7200,bold:true,color:'087A3E',size:15})}<w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:jc w:val="right"/></w:pPr>${wordRun('Page ',false,'536159',15)}<w:fldSimple w:instr=" PAGE "><w:r><w:rPr><w:color w:val="087A3E"/><w:b/><w:sz w:val="15"/></w:rPr><w:t>1</w:t></w:r></w:fldSimple></w:p></w:tc></w:tr></w:tbl></w:ftr>`;
-        zip.file('word/document.xml',documentXml);zip.file('word/styles.xml',stylesXml);zip.file('word/footer1.xml',footerXml);zip.file('word/settings.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:updateFields w:val="true"/><w:doNotTrackMoves/><w:doNotTrackFormatting/></w:settings>');
-        zip.file('word/_rels/document.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/><Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>${relationships.map(rel=>`<Relationship Id="${rel.id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="${rel.target}"/>`).join('')}</Relationships>`);
-        media.forEach(file=>zip.file(file.path,file.base64,{base64:true}));
-        const now=new Date().toISOString();zip.file('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${xmlEscape(data.reportTitle||'Rapport de prise en charge')} - ${xmlEscape(data.projectName||'Chantier')}</dc:title><dc:creator>SOGITEC</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created></cp:coreProperties>`);zip.file('docProps/app.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>SOGITEC Prise en charge</Application></Properties>');
-        const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}),link=document.createElement('a'),slug=(data.projectName||'chantier').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-');link.href=URL.createObjectURL(blob);link.download=`prise-en-charge-${slug}.docx`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1500);toast('Document Word exporté');
-      }
       function parseXml(text){const doc=new DOMParser().parseFromString(text,'application/xml');if(doc.querySelector('parsererror'))throw new Error('Fichier Excel illisible');return doc;}
       function dataUrlToBlob(url){const parts=url.split(','),mime=(parts[0].match(/data:([^;]+)/)||[])[1]||'image/jpeg',binary=atob(parts[1]||''),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:mime});}
       async function importExcelFile(file){
@@ -1252,13 +1197,13 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         rows.slice(1).forEach(values=>{
           const cells=values.map(v=>v??''),itemId=readEquipmentCell(cells,'ID équipement'),sectionId=readEquipmentCell(cells,'ID localisation'),sectionName=readEquipmentCell(cells,'Localisation','Localisation principale'),equipment=readEquipmentCell(cells,'Équipement'),quantity=readEquipmentCell(cells,'Quantité'),brand=readEquipmentCell(cells,'Marque'),model=readEquipmentCell(cells,'Modèle'),serialNumber=readEquipmentCell(cells,'N° de série'),location=readEquipmentCell(cells,'Localisation équipement','Localisation précise'),remark=readEquipmentCell(cells,'Remarque'),criticality=readEquipmentCell(cells,'Criticité');
           if(!String(equipment).trim())return;const normalizedSection=normalizeLocation(sectionName),key=sectionId||`name:${normalizedSection}`;let section=sectionMap.get(key);
-          if(!section){section={id:sectionId||uid(),name:normalizedSection,remark:'',photos:[],items:[],hasConformity:false,collapsed:false};sectionMap.set(key,section);sections.push(section);}
+          if(!section){section={id:sectionId||uid(),name:normalizedSection,remark:'',photos:[],items:[],hasConformity:true,collapsed:false};sectionMap.set(key,section);sections.push(section);}
           const old=oldItems.get(itemId),statusText=String(criticality).toLowerCase(),status=statusText.includes('solution')?'solution':statusText.includes('vigilance')?'vigilance':'ok';
           section.items.push({id:itemId||uid(),equipment:String(equipment),quantity:String(quantity),brand:String(brand),model:String(model),serialNumber:String(serialNumber),location:String(location),remark:String(remark),status,photos:old?.photos||[]});
         });
-        if(locationRows.length>1){const headers=new Map((locationRows[0]||[]).map((value,index)=>[normalizeHeader(value),index]));const readLocation=(cells,...labels)=>{for(const label of labels){const index=headers.get(normalizeHeader(label));if(index!==undefined)return cells[index]??'';}return '';};locationRows.slice(1).forEach(values=>{const cells=values.map(value=>value??''),id=readLocation(cells,'ID localisation'),name=normalizeLocation(readLocation(cells,'Localisation')),remark=readLocation(cells,'Remarque'),hasConformity=/^(oui|yes|1|vrai)$/i.test(String(readLocation(cells,'Conformité ajoutée','Conformité'))),key=id||`name:${name}`;if(!name&&!remark)return;let section=sectionMap.get(key)||sections.find(entry=>entry.id===id)||sections.find(entry=>entry.name===name);if(!section){section={id:id||uid(),name,remark:String(remark),photos:[],items:[],hasConformity,collapsed:false};sectionMap.set(key,section);sections.push(section);}else{section.remark=String(remark);section.hasConformity=hasConformity;}});}
+        if(locationRows.length>1){const headers=new Map((locationRows[0]||[]).map((value,index)=>[normalizeHeader(value),index]));const readLocation=(cells,...labels)=>{for(const label of labels){const index=headers.get(normalizeHeader(label));if(index!==undefined)return cells[index]??'';}return '';};locationRows.slice(1).forEach(values=>{const cells=values.map(value=>value??''),id=readLocation(cells,'ID localisation'),name=normalizeLocation(readLocation(cells,'Localisation')),remark=readLocation(cells,'Remarque'),hasConformity=true,key=id||`name:${name}`;if(!name&&!remark)return;let section=sectionMap.get(key)||sections.find(entry=>entry.id===id)||sections.find(entry=>entry.name===name);if(!section){section={id:id||uid(),name,remark:String(remark),photos:[],items:[],hasConformity,collapsed:false};sectionMap.set(key,section);sections.push(section);}else{section.remark=String(remark);section.hasConformity=hasConformity;}});}
         if(!sections.length)throw new Error('Aucune localisation ni aucun équipement trouvé dans le fichier Excel');
-        sections.forEach(section=>{const old=oldSections.get(section.id),saved=new Map((old?.conformity||[]).map(check=>[check.id,check]));section.remark=String(section.remark||old?.remark||'');section.photos=[...(old?.photos||[])];section.collapsed=Boolean(old?.collapsed);if(typeof section.hasConformity!=='boolean')section.hasConformity=Boolean(old?.hasConformity);section.conformity=conformityChecklist.map(base=>{const previous=saved.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(previous.status)?previous.status:'',remark:String(previous.remark||'')};});});data.sections=sections;
+        sections.forEach(section=>{const old=oldSections.get(section.id),saved=new Map((old?.conformity||[]).map(check=>[check.id,check]));section.remark=String(section.remark||old?.remark||'');section.photos=[...(old?.photos||[])];section.collapsed=Boolean(old?.collapsed);section.hasConformity=true;section.conformity=conformityChecklist.map(base=>{const previous=saved.get(base.id)||{};return {...base,status:['valid','na','invalid'].includes(previous.status)?previous.status:'',remark:String(previous.remark||'')};});});data.sections=sections;
         if(photoRows.length>1){
           const importedItems=new Map(sections.flatMap(section=>section.items.map(item=>[item.id,item]))),importedSections=new Map(sections.map(section=>[section.id,section])),groups=new Map();sections.forEach(section=>{section.photos=[];section.items.forEach(item=>item.photos=[]);});
           photoRows.slice(1).forEach(values=>{const [type,itemId,photoId,order,part,chunk]=values.map(v=>String(v??''));if(!chunk)return;const key=[type,itemId,photoId,order].join('|');if(!groups.has(key))groups.set(key,{type,itemId,photoId,order:Number(order)||0,parts:[]});groups.get(key).parts[Number(part)||0]=chunk;});
@@ -1291,7 +1236,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       document.getElementById('visitDate').addEventListener('input', e => { data.visitDate=e.target.value; save(); });
       document.getElementById('technician').addEventListener('input', e => { data.technician=e.target.value; save(); });
       document.getElementById('agencySelect').addEventListener('change', e => { data.agency=e.target.value; renderAgency(); save(); });
-      function addLocationSection(){ data.sections.push({id:uid(),name:'',remark:'',photos:[],items:[row()],conformity:clone(conformityChecklist),hasConformity:false,collapsed:false}); save(); render(); setTimeout(()=>{const input=document.querySelector('#sections .section:last-child .section-name-input'); input?.scrollIntoView({behavior:'smooth',block:'center'}); input?.focus();},20); }
+      function addLocationSection(){ data.sections.push({id:uid(),name:'',remark:'',photos:[],items:[row()],conformity:clone(conformityChecklist),hasConformity:true,collapsed:false}); save(); render(); setTimeout(()=>{const input=document.querySelector('#sections .section:last-child .section-name-input'); input?.scrollIntoView({behavior:'smooth',block:'center'}); input?.focus();},20); }
       document.getElementById('addYellowTab').addEventListener('click', addLocationSection);
       document.getElementById('printReport').addEventListener('click', async () => {
         document.activeElement?.blur();
@@ -1305,7 +1250,6 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         }, 180));
       });
       window.addEventListener('beforeprint',updateProjectNameDisplays);
-      document.getElementById('exportWord').addEventListener('click',()=>exportWord().catch(error=>{console.error(error);toast('Export Word impossible');}));
       document.getElementById('exportExcel').addEventListener('click', exportExcel);
       document.getElementById('importExcel').addEventListener('change', async event => {const file=event.target.files[0];if(!file)return;try{await importExcelFile(file);}catch(error){toast(error.message||'Import Excel impossible');}event.target.value='';});
       document.getElementById('resetReport').addEventListener('click', () => { if(!confirm('Réinitialiser toutes les saisies ? Les photos seront dissociées du rapport.')) return; data=clone(emptySeed); save(); load(); render(); toast('Rapport réinitialisé'); });
